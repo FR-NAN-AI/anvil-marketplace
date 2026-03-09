@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: tool
+name: web-tools
+title: Web Tools
+version: 0.1.0
+description: Limited web access
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

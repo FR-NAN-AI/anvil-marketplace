@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: recipe
+name: review/review-response
+title: Review/review Response
+version: 0.1.0
+description: Respond to review feedback
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

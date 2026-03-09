@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: tool
+name: bash-dev
+title: Bash Dev
+version: 0.1.0
+description: Developer bash tools
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

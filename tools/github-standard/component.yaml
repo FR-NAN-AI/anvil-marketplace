@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: tool
+name: github-standard
+title: Github Standard
+version: 0.1.0
+description: Standard GitHub toolsets
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: recipe
+name: management/sprint-analysis
+title: Management/sprint Analysis
+version: 0.1.0
+description: Sprint analysis report
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

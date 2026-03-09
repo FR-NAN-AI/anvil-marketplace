@@ -1,0 +1,16 @@
+schema: anvil.component/v1
+type: agent
+name: task-executor
+title: Task Executor
+version: 0.1.0
+description: Implements tasks and delivers tested changes
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+    model: sonnet
+  cursor:
+    supported: true
+entry:
+  file: index.md

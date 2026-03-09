@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: recipe
+name: setup/onboarding
+title: Setup/onboarding
+version: 0.1.0
+description: Project onboarding and intelligent setup
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

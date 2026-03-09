@@ -1,0 +1,25 @@
+name: java-developer
+description: Skills and tools for Java teams
+skills:
+  - coding-principles
+  - testing-tdd
+  - security-review
+  - read-ticket
+  - implement-feature
+  - create-pr
+agents:
+  - requirement-analyzer
+  - task-executor
+hooks:
+  - jira-sync
+tools:
+  - github-standard
+  - bash-dev
+recipes:
+  - development/us-to-pr
+  - development/bugfix
+  - review/pr-review
+overrides:
+  read-ticket: jira
+config:
+  bash_tools: ["mvn", "gradle", "java", "git:*"]

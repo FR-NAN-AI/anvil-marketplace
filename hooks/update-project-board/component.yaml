@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: hook
+name: update-project-board
+title: Update Project Board
+version: 0.1.0
+description: Update GitHub project fields
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

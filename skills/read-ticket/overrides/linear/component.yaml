@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: skill
+name: read-ticket-linear
+title: Read Ticket Linear
+version: 0.1.0
+description: Linear override for ticket reading
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md
