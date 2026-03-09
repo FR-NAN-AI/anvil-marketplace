@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: hook
+name: changelog-update
+title: Changelog Update
+version: 0.1.0
+description: Generate or update CHANGELOG from commits after version tags
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

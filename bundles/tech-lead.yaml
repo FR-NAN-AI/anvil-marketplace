@@ -24,6 +24,11 @@ components:
     - architect
     - quality-guardian
     - security-auditor
+  hooks:
+    - pre-commit-check
+    - post-merge-sync
+    - changelog-update
+    - dependency-check
   tools:
     - github-standard
     - bash-dev

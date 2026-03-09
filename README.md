@@ -39,6 +39,14 @@ Generic, project-agnostic components that work with any tech stack.
 | `quality-guardian` | Audits quality — complexity, duplication, debt, coverage |
 | `security-auditor` | Security audit — OWASP, injections, secrets, dependencies |
 
+### Hooks
+| Name | Description |
+|------|-------------|
+| `pre-commit-check` | Verify lint, tests, and no secrets before each commit |
+| `post-merge-sync` | Update dependencies and regenerate artifacts after merge |
+| `changelog-update` | Generate CHANGELOG from conventional commits |
+| `dependency-check` | Check for outdated or vulnerable dependencies |
+
 ### Tools
 | Name | Description |
 |------|-------------|
@@ -50,7 +58,7 @@ Generic, project-agnostic components that work with any tech stack.
 | Name | Description |
 |------|-------------|
 | `starter` | Minimal — coding-principles, create-pr, onboarding |
-| `full-stack` | Complete — all skills, recipes, agents, tools |
+| `full-stack` | Complete — all skills, recipes, agents, hooks, tools |
 | `tech-lead` | Quality, reviews, and process |
 
 ## Usage
@@ -71,6 +79,7 @@ anvil init --agent copilot --preset starter
 ```
 skills/          AI agent skills
 agents/          Autonomous agents
+hooks/           Automated checks and workflows
 tools/           Tool configurations
 recipes/         Multi-step workflows
 bundles/         Curated component sets

@@ -72,6 +72,24 @@ items:
     path: agents/security-auditor
     description: Security audit — OWASP, injections, secrets, dependencies
 
+  # Hooks
+  - type: hook
+    name: pre-commit-check
+    path: hooks/pre-commit-check
+    description: Verify lint, tests, and no secrets before each commit
+  - type: hook
+    name: post-merge-sync
+    path: hooks/post-merge-sync
+    description: Update dependencies and regenerate artifacts after merge
+  - type: hook
+    name: changelog-update
+    path: hooks/changelog-update
+    description: Generate or update CHANGELOG from commits after version tags
+  - type: hook
+    name: dependency-check
+    path: hooks/dependency-check
+    description: Check for outdated or vulnerable dependencies
+
   # Tools
   - type: tool
     name: github-standard
