@@ -5,7 +5,7 @@
 
 ## Pre-condition — MANDATORY CHECK
 
-1. Read `.agent/config.json`
+1. Read `.anvil/config.json`
 2. If the file does not exist → **STOP.** Tell the user to run project initialization first.
 3. If `"onboarded": true` → **STOP.** Do not execute this skill. Say: "Project already onboarded."
 4. Otherwise → proceed to Préambule.
@@ -14,12 +14,12 @@
 
 - **NEVER** start coding or implementing features during onboarding
 - **NEVER** create pull requests or make code changes
-- **ONLY** create configuration files (`.agent/`) and documentation (`.agent/docs/`)
+- **ONLY** create configuration files (`.anvil/`) and documentation (`.anvil/docs/`)
 
 Examples:
 - WRONG: "I'll set up the project structure and create the initial files for you."
 - WRONG: Creating source code files, modifying existing code, running build commands.
-- RIGHT: Only creating files in `.agent/docs/` and modifying `.agent/config.json`.
+- RIGHT: Only creating files in `.anvil/docs/` and modifying `.anvil/config.json`.
 
 ## Préambule
 
@@ -36,7 +36,7 @@ Les blocs ``` dans ce document sont des **modèles de message**. Tu dois les ADA
 **After outputting each phase, STOP and wait for the user to respond.** Never generate the next phase in the same response. Each phase = one message. This rule applies to ALL phase transitions without exception.
 
 ### Progression par phase
-After completing each phase, update `.agent/config.json` with `"onboardingPhase": <phase_number>`. On resuming after interruption, read `onboardingPhase` from config and skip to that phase. Tell the user: "Si on est interrompu, pas d'inquiétude — je reprendrai exactement là où on s'est arrêtés."
+After completing each phase, update `.anvil/config.json` with `"onboardingPhase": <phase_number>`. On resuming after interruption, read `onboardingPhase` from config and skip to that phase. Tell the user: "Si on est interrompu, pas d'inquiétude — je reprendrai exactement là où on s'est arrêtés."
 
 ### Accueil
 Commence par un accueil chaleureux. Explique ce qu'est l'onboarding (adapt tone and language to the user):
@@ -97,7 +97,7 @@ Analyze the project files to detect. **Stop scanning once you've identified the 
 **New Project Detection:**
 - If NO config files are found (no `package.json`, no `pom.xml`, no `requirements.txt`, no framework files), this is a new project.
 - An empty or near-empty directory with only a `.git` folder or a README qualifies as a new project.
-- Store this detection in config: `"isNewProject": true` in `.agent/config.json` so it persists across conversation turns.
+- Store this detection in config: `"isNewProject": true` in `.anvil/config.json` so it persists across conversation turns.
 
 ### Present Findings — Conversational Style
 Don't just list results. Explain what each detection implies for the user:
@@ -133,7 +133,7 @@ Explain: you'll check CLI tools (git, npm, etc.) and MCP connections (bridges to
 ```
 
 ### Read Bundle Configuration
-1. Read `.agent/config.json` to get the configured bundle
+1. Read `.anvil/config.json` to get the configured bundle
 2. Load the bundle YAML from the framework to see required tools and skills
 3. For each skill/recipe in the bundle, check if required tools are available
 
@@ -283,7 +283,7 @@ Recommend "all essential" as default (basic skills only, nothing intrusive). Rem
 1. **Let the developer choose** which components to install (skills, recipes, hooks, agents)
 2. For each selected component:
    - Use the `catalog-browser` skill to install. If `catalog-browser` is not available, read component files directly from the framework directory structure and manually add them to config.
-   - Add to `.agent/config.json` in appropriate section with `source: "framework"` and calculated hash
+   - Add to `.anvil/config.json` in appropriate section with `source: "framework"` and calculated hash
    - Provide brief description of what the component provides
 3. **Handle overrides** correctly:
    - If a component with overrides is selected (e.g., `read-ticket`), use the override determined in Phase 1 (the ticket system the developer confirmed).
@@ -310,9 +310,9 @@ Voici ce qui a été installé :
 **Tout est désinstallable.** Si un composant vous gêne ou ne vous convient pas, demandez-moi de le retirer.
 
 **Où vivent ces fichiers ?**
-Voici la structure de votre dossier `.agent/` :
+Voici la structure de votre dossier `.anvil/` :
 ```
-.agent/
+.anvil/
   config.json    — La configuration principale (stack, composants, overrides)
   docs/          — La documentation du projet (que j'utilise à chaque interaction)
   skills/        — Les skills installés (fichiers texte lisibles et modifiables)
@@ -362,7 +362,7 @@ Quelle approche préférez-vous ?
 ```
 
 ### Analyze Current Documentation
-Check for these files in `.agent/docs/`:
+Check for these files in `.anvil/docs/`:
 - `ARCHITECTURE.md` — System architecture overview
 - `CODEBASE.md` — Code organization and structure
 - `DATABASE.md` — Database schema and setup
@@ -428,7 +428,7 @@ For each applicable document, **DO NOT** copy empty templates. Instead:
 - Document environment configurations
 
 ### New Project Workflow
-**If `isNewProject` is true in `.agent/config.json`:**
+**If `isNewProject` is true in `.anvil/config.json`:**
 
 ```
 🆕 **Projet nouveau — Brainstorming de départ**
@@ -573,7 +573,7 @@ Voici ce que je propose de configurer :
 ```
 
 ### Analyze and Propose Overrides
-Based on your detections, propose appropriate overrides for `.agent/config.json`:
+Based on your detections, propose appropriate overrides for `.anvil/config.json`:
 
 **Ticket Management Override:**
 - Only set this override based on what the developer **confirmed** in Phase 1.
@@ -592,7 +592,7 @@ Show the developer what overrides you want to add, explaining each one:
 ```
 ⚙️ **Personnalisations proposées**
 
-Je vais ajouter ces réglages à `.agent/config.json` :
+Je vais ajouter ces réglages à `.anvil/config.json` :
 
 {
   "overrides": {
@@ -613,7 +613,7 @@ After user confirmation, update config: `"onboardingPhase": 5`
 ## Phase 6 : Conclusion et guide de démarrage
 
 ### Mark Onboarding Complete
-Update `.agent/config.json` with:
+Update `.anvil/config.json` with:
 ```json
 {
   "onboarded": true,
