@@ -1,9 +1,9 @@
 schema: anvil.component/v1
 type: skill
-name: update-skills
-title: Update Skills
+name: verification-before-completion
+title: Verification Before Completion
 version: 0.1.0
-description: Intelligent skill updates and merging
+description: Evidence before claims — run verification commands before declaring work complete
 targets:
   copilot:
     supported: true

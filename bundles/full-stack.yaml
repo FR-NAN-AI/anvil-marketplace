@@ -1,5 +1,5 @@
-name: tech-lead
-description: Skills and workflows for tech leads — code quality, reviews, and process
+name: full-stack
+description: Complete bundle — all generic skills, recipes, and agents
 components:
   skills:
     - coding-principles
@@ -23,3 +23,4 @@ components:
   tools:
     - github-standard
     - bash-dev
+    - web-tools

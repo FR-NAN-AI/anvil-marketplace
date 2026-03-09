@@ -1,33 +1,26 @@
 version: 1
 items:
+  # Skills
   - type: skill
     name: coding-principles
     path: skills/coding-principles
-    description: Core coding principles
+    description: Universal coding principles — DRY, YAGNI, KISS, SOLID
   - type: skill
-    name: testing-tdd
-    path: skills/testing-tdd
-    description: Test-driven development guidance
+    name: test-driven-development
+    path: skills/test-driven-development
+    description: RED-GREEN-REFACTOR cycle — write failing test first
+  - type: skill
+    name: systematic-debugging
+    path: skills/systematic-debugging
+    description: 4-phase root cause analysis — investigate before fixing
+  - type: skill
+    name: verification-before-completion
+    path: skills/verification-before-completion
+    description: Evidence before claims — verify before declaring done
   - type: skill
     name: security-review
     path: skills/security-review
     description: Security review checklist
-  - type: skill
-    name: read-ticket
-    path: skills/read-ticket/base
-    description: Base ticket reading skill
-  - type: skill
-    name: read-ticket-jira
-    path: skills/read-ticket/overrides/jira
-    description: Jira override for ticket reading
-  - type: skill
-    name: read-ticket-linear
-    path: skills/read-ticket/overrides/linear
-    description: Linear override for ticket reading
-  - type: skill
-    name: read-ticket-azure-devops
-    path: skills/read-ticket/overrides/azure-devops
-    description: Azure DevOps override for ticket reading
   - type: skill
     name: implement-feature
     path: skills/implement-feature
@@ -47,23 +40,9 @@ items:
   - type: skill
     name: catalog-browser
     path: skills/catalog-browser
-    description: Browse and install skills marketplace
-  - type: skill
-    name: update-skills
-    path: skills/update-skills
-    description: Intelligent skill updates and merging
-  - type: hook
-    name: jira-sync
-    path: hooks/jira-sync
-    description: Sync workflow output to Jira
-  - type: hook
-    name: slack-notify
-    path: hooks/slack-notify
-    description: Send Slack notification
-  - type: hook
-    name: update-project-board
-    path: hooks/update-project-board
-    description: Update GitHub project fields
+    description: Browse and install components from the marketplace
+
+  # Agents
   - type: agent
     name: requirement-analyzer
     path: agents/requirement-analyzer
@@ -72,6 +51,8 @@ items:
     name: task-executor
     path: agents/task-executor
     description: Implements tasks and delivers tested changes
+
+  # Tools
   - type: tool
     name: github-standard
     path: tools/github-standard
@@ -84,6 +65,8 @@ items:
     name: web-tools
     path: tools/web-tools
     description: Limited web access
+
+  # Recipes
   - type: recipe
     name: development/us-to-pr
     path: recipes/development/us-to-pr
@@ -91,23 +74,23 @@ items:
   - type: recipe
     name: development/us-to-pr/us-analyze
     path: recipes/development/us-to-pr/us-analyze
-    description: US Analysis — Phase 1 (GH-AW split)
+    description: US Analysis — Phase 1
   - type: recipe
     name: development/us-to-pr/us-brainstorm
     path: recipes/development/us-to-pr/us-brainstorm
-    description: US Brainstorm — Dialogue Loop (GH-AW split)
+    description: US Brainstorm — Dialogue Loop
   - type: recipe
     name: development/us-to-pr/us-plan
     path: recipes/development/us-to-pr/us-plan
-    description: US Plan — Phase 2 (GH-AW split)
+    description: US Plan — Phase 2
   - type: recipe
     name: development/us-to-pr/us-implement
     path: recipes/development/us-to-pr/us-implement
-    description: US Implementation — Phase 3 (GH-AW split)
+    description: US Implementation — Phase 3
   - type: recipe
     name: development/us-to-pr/us-deliver
     path: recipes/development/us-to-pr/us-deliver
-    description: US Delivery — Final Phase (GH-AW split)
+    description: US Delivery — Final Phase
   - type: recipe
     name: development/bugfix
     path: recipes/development/bugfix
@@ -120,35 +103,17 @@ items:
     name: review/post-merge-check
     path: recipes/review/post-merge-check
     description: Post-merge health check
-  - type: recipe
-    name: review/review-response
-    path: recipes/review/review-response
-    description: Respond to review feedback
-  - type: recipe
-    name: product/requirement-to-us
-    path: recipes/product/requirement-to-us
-    description: Requirements to user story
-  - type: recipe
-    name: management/sprint-analysis
-    path: recipes/management/sprint-analysis
-    description: Sprint analysis report
-  - type: recipe
-    name: management/daily-standup
-    path: recipes/management/daily-standup
-    description: Daily standup summary
-  - type: recipe
-    name: setup/onboarding
-    path: recipes/setup/onboarding
-    description: Project onboarding and intelligent setup
+
+  # Bundles
   - type: bundle
-    name: java-developer
-    path: bundles/java-developer.yaml
-    description: Java team bundle
+    name: starter
+    path: bundles/starter.yaml
+    description: Minimal bundle for any project
   - type: bundle
-    name: react-frontend
-    path: bundles/react-frontend.yaml
-    description: React frontend bundle
+    name: full-stack
+    path: bundles/full-stack.yaml
+    description: Complete bundle — all skills, recipes, and agents
   - type: bundle
     name: tech-lead
     path: bundles/tech-lead.yaml
-    description: Tech lead bundle
+    description: Tech lead bundle — quality, reviews, and process

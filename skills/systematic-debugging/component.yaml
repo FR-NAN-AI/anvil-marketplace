@@ -1,9 +1,9 @@
 schema: anvil.component/v1
-type: recipe
-name: product/requirement-to-us
-title: Product/requirement To Us
+type: skill
+name: systematic-debugging
+title: Systematic Debugging
 version: 0.1.0
-description: Requirements to user story
+description: 4-phase root cause analysis — investigate before fixing, never guess
 targets:
   copilot:
     supported: true

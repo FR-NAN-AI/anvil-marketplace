@@ -1,0 +1,9 @@
+name: starter
+description: Minimal bundle for any project — essential skills only
+components:
+  skills:
+    - coding-principles
+    - onboarding
+    - anvil-cli-reference
+    - create-pr
+    - verification-before-completion
