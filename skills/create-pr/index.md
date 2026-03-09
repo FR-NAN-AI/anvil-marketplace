@@ -46,17 +46,10 @@ Prepare a high-quality pull request:
 - Add type labels (feature, bugfix, chore).
 - Add area or component labels.
 - Add priority label if the ticket indicates one.
-
-## Labels
 - Add `agent-generated` if applicable.
 - Add `in-review` on the linked issue or ticket.
 
-## Final Check
-- Ensure no debug logs or TODOs without tickets.
-- Confirm tests are passing.
-
-## Hard Gate
-- Do NOT merge the PR yourself.
-- Do not close the ticket.
-- Do not skip the PR description.
-- You create and hand off — the team reviews and merges.
+## Related Components
+- **Before creating PR**: Run `verification-before-completion` gate to confirm all tests pass
+- **Implementation plan**: Include the plan summary from `implement-feature` in the PR body
+- **Reviewers**: Check CODEOWNERS file; if absent, ask the developer who should review

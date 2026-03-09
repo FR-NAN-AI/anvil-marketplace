@@ -48,25 +48,7 @@ After a major implementation step is completed — a feature, a bugfix, a refact
 - No obvious injection vectors (SQL, XSS, command)
 
 ## Output Format
-
-```markdown
-## Code Review — [Feature/Change Name]
-
-### Summary
-[1-2 sentences: overall assessment]
-
-### Critical (must fix before merge)
-- [ ] [Issue description + file:line + why it's critical]
-
-### Important (should fix)
-- [ ] [Issue description + file:line + recommendation]
-
-### Suggestions (nice to have)
-- [ ] [Improvement idea + rationale]
-
-### What's Good
-- [Acknowledge quality aspects of the implementation]
-```
+Review report categorized by severity: Critical (must fix before merge), Important (should fix), Suggestions (nice to have), What's Good (positive feedback). Each finding includes: location (file:line), issue description, and concrete fix suggestion.
 
 ## Rules
 

@@ -1,16 +1,63 @@
 ---
 ---
 
-# Project Onboarding
+# Project Onboarding — Version Éducative
 
-**IMPORTANT**: This skill only executes if `.agent/config.json` exists but `onboarded` is not `true`. If you see `"onboarded": true` in the config, skip this skill entirely and proceed with normal operation.
+## Pre-condition — MANDATORY CHECK
 
-This skill guides you through intelligent project setup and configuration. It's conversational — ask questions when you're unsure, don't work in silence.
+1. Read `.agent/config.json`
+2. If the file does not exist → **STOP.** Tell the user to run project initialization first.
+3. If `"onboarded": true` → **STOP.** Do not execute this skill. Say: "Project already onboarded."
+4. Otherwise → proceed to Préambule.
 
-## Phase 1: Stack Detection
+## Contraintes absolues (s'appliquent à TOUTES les phases)
+
+- **NEVER** start coding or implementing features during onboarding
+- **NEVER** create pull requests or make code changes
+- **ONLY** create configuration files (`.agent/`) and documentation (`.agent/docs/`)
+
+Examples:
+- WRONG: "I'll set up the project structure and create the initial files for you."
+- WRONG: Creating source code files, modifying existing code, running build commands.
+- RIGHT: Only creating files in `.agent/docs/` and modifying `.agent/config.json`.
+
+## Préambule
+
+### Langue et ton
+- **CRITICAL: All instructions in this document are written in English for precision, but you MUST communicate with the user in THEIR language (detected from their messages). Never respond to the user in English unless they write in English.**
+- **Expliquer avant d'agir.** Avant chaque phase, explique à l'utilisateur ce qui va se passer et pourquoi. Ne fais jamais une action sans l'avoir annoncée.
+- **Ne jamais supposer que l'utilisateur connaît les concepts IA.** Chaque terme technique (skill, hook, agent, recipe, MCP) doit être expliqué la première fois qu'il apparaît, en termes de bénéfice concret pour l'utilisateur.
+- **Ton chaleureux, pédagogique, encourageant.** L'onboarding est un moment d'accueil. Sois patient, pose des questions, invite l'utilisateur à poser les siennes.
+
+### Conventions de ce document — Templates
+Les blocs ``` dans ce document sont des **modèles de message**. Tu dois les ADAPTER au contexte réel du projet. Les éléments entre `{{double_accolades}}` sont des placeholders à remplacer par les valeurs détectées. Ne reproduis JAMAIS les accolades ni le texte placeholder dans ta réponse. Les blocs sans placeholder sont des textes à adapter au ton et à la langue de l'utilisateur.
+
+### Phase transitions — CRITICAL RULE
+**After outputting each phase, STOP and wait for the user to respond.** Never generate the next phase in the same response. Each phase = one message. This rule applies to ALL phase transitions without exception.
+
+### Progression par phase
+After completing each phase, update `.agent/config.json` with `"onboardingPhase": <phase_number>`. On resuming after interruption, read `onboardingPhase` from config and skip to that phase. Tell the user: "Si on est interrompu, pas d'inquiétude — je reprendrai exactement là où on s'est arrêtés."
+
+### Accueil
+Commence par un accueil chaleureux. Explique ce qu'est l'onboarding (adapt tone and language to the user):
+
+```
+Present a warm welcome that explains: (1) what onboarding is — "I'm learning about your project", (2) the 6 phases in a numbered list (analyze, tools, components, documentation, configuration, finalize), (3) resumability after interruption, (4) invitation to ask questions. End with "On commence ?"
+```
+
+---
+
+## Phase 1 : Analyse du projet
+
+### Explication préalable
+Avant de commencer l'analyse, explique à l'utilisateur :
+
+```
+Explain to the user: you'll scan project files to detect language, framework, database, and ticket system. Use the "diagnostic" analogy — you look but don't touch. You'll present findings for confirmation.
+```
 
 ### Scan Project Structure
-Analyze the project files to detect:
+Analyze the project files to detect. **Stop scanning once you've identified the primary stack** — do not exhaustively search for all possible technologies.
 
 **Technology Stack:**
 - Java: Look for `pom.xml`, `build.gradle`, `gradle.properties`
@@ -47,29 +94,43 @@ Analyze the project files to detect:
 - If nothing is detected, **always ask the developer**: "What ticket management system do you use? (Jira / Linear / Azure DevOps / GitHub Issues / Other)"
 - Only after the developer confirms should you set the override in the config.
 
-### Present Findings
-Summarize your detection results to the developer:
+**New Project Detection:**
+- If NO config files are found (no `package.json`, no `pom.xml`, no `requirements.txt`, no framework files), this is a new project.
+- An empty or near-empty directory with only a `.git` folder or a README qualifies as a new project.
+- Store this detection in config: `"isNewProject": true` in `.agent/config.json` so it persists across conversation turns.
+
+### Present Findings — Conversational Style
+Don't just list results. Explain what each detection implies for the user:
 
 ```
-🔍 **Project Analysis**
-
-**Technology Stack**: [Detected stack]
-**Framework**: [Detected framework]
-**Database**: [Detected database or "None detected"]
-**Ticket Management**: [Detected system or "GitHub Issues (default)"]
-
-**Key Files Found**:
-- [List important config files you found]
-
-**Questions**:
-- [Any clarifications needed about your detection]
-
-Is this analysis correct? Please confirm or correct any mistakes.
+For each detection (language, framework, database, tickets), present:
+- What was detected and in which file
+- What it implies for the user (which tools/components it unlocks)
+- End with: "Est-ce correct ? Ai-je raté quelque chose ?"
 ```
 
-Wait for confirmation before proceeding to Phase 2.
+**If no config files were found (new project):**
+```
+🆕 **Projet nouveau détecté**
 
-## Phase 2: Tools and Dependencies Verification
+Je vois que votre projet est tout neuf — pas encore de fichiers de configuration ou de code. Pas de souci ! On va adapter les prochaines étapes :
+- La vérification d'outils portera sur les outils généraux
+- En Phase 4, je vous proposerai un brainstorming pour définir votre stack et architecture
+- On pourra utiliser les skills de brainstorming pour concevoir votre projet ensemble
+
+Pour l'instant, avez-vous déjà une idée de la stack que vous voulez utiliser ?
+```
+
+After user confirmation, update config: `"onboardingPhase": 1`
+
+---
+
+## Phase 2 : Vérification des outils
+
+### Explication préalable
+```
+Explain: you'll check CLI tools (git, npm, etc.) and MCP connections (bridges to external tools like Jira, Slack). If something is missing, you'll explain what it does and help install it.
+```
 
 ### Read Bundle Configuration
 1. Read `.agent/config.json` to get the configured bundle
@@ -78,22 +139,43 @@ Wait for confirmation before proceeding to Phase 2.
 
 ### CLI Tools Check
 Based on detected stack, verify these tools are available:
-- `gh` (GitHub CLI) - Always required
-- `git` - Always required
-- `npm` or `yarn` - If Node.js detected
-- `mvn` or `gradle` - If Java detected
-- `pip` or `poetry` - If Python detected
-- `flutter` - If Flutter detected
-- `composer` - If PHP detected
-- `dotnet` - If .NET detected
-- `cargo` - If Rust detected
-- `go` - If Go detected
+- `gh` (GitHub CLI) — Always required
+- `git` — Always required
+- `npm` or `yarn` — If Node.js detected
+- `mvn` or `gradle` — If Java detected
+- `pip` or `poetry` — If Python detected
+- `flutter` — If Flutter detected
+- `composer` — If PHP detected
+- `dotnet` — If .NET detected
+- `cargo` — If Rust detected
+- `go` — If Go detected
 
-### MCP Tools Check
+### When a tool is missing — Conversational Guidance
+When a tool is not found, do NOT just list it as missing. Engage a conversation:
+
+```
+For each missing tool: explain its purpose in one sentence, provide install commands per OS (Windows/macOS/Linux), and offer to guide. Wait for acknowledgment before the next tool.
+```
+
+Present missing tools one at a time, not as a batch list.
+
+### MCP Tools Check — With Education
 For each MCP tool referenced in the bundle:
 - Check if the tool is available in your environment
-- If missing, provide specific installation instructions
-- Explain what the tool is used for in the context of this project
+- If available, confirm it
+- If missing, first explain what MCP is (only the first time):
+
+```
+First time mentioning MCP: explain as "bridges between me and your external tools" with 2-3 examples (Jira, Slack, database). Mention they're optional but enriching.
+```
+
+Then for each missing MCP:
+```
+🔌 **{{mcp_name}} — non configuré**
+
+Ce MCP me permettrait de {{explication_du_benefice_concret}}.
+Voulez-vous qu'on le configure ensemble maintenant, ou préférez-vous le faire plus tard ?
+```
 
 ### Override-dependent Tools Check
 Based on what was confirmed in Phase 1, verify the tools needed for those choices:
@@ -103,169 +185,198 @@ Based on what was confirmed in Phase 1, verify the tools needed for those choice
 - If a **database** was detected → check that any required database MCP or CLI client is available.
 - **Do NOT skip this step.** The overrides confirmed in Phase 1 imply tool dependencies that must be verified here.
 
-### Report Tool Status
+### Report Tool Status — Conversational
 ```
-🔧 **Tools Status**
-
-**CLI Tools**:
-✅ gh (GitHub CLI) - Available
-✅ git - Available
-❌ npm - Not found
-   💡 Install: Run `npm install -g npm` or install Node.js
-
-**MCP Tools**:
-✅ github-standard - Available
-❌ jira-mcp - Not configured
-   💡 Setup: Configure Jira MCP in your agent environment
-
-**Next Steps**:
-[List what needs to be installed/configured manually]
+Present tool status grouped by: CLI Tools (✅/❌ with version), MCP Connections (✅/⚠️). Ask if questions before continuing.
 ```
 
-## Phase 2.5: Skills Selection
+After user confirmation, update config: `"onboardingPhase": 2`
 
-### Catalog-Based Skill Recommendations
+---
 
-Now that tools are verified, help the developer select relevant skills for their project.
+## Phase 3 : Recommandation de composants
 
-#### Read Available Skills
-1. Use the `catalog-browser` skill to read the framework catalog
-2. Present available skills organized by category
-3. Based on the stack detected in Phase 1, **recommend** relevant skills
-
-#### Technology-Based Recommendations
-
-**For Java projects:**
-- ✅ `coding-principles` (always recommended)
-- ✅ `testing-tdd` (essential for Java development)
-- ✅ `implement-feature` (structured feature workflow)
-- ✅ `create-pr` (PR creation guidance)
-- ✅ `security-review` (security patterns for Java/Spring)
-
-**For Node.js/React projects:**
-- ✅ `coding-principles` (always recommended)
-- ✅ `testing-tdd` (adapted for Jest/Cypress/Playwright)
-- ✅ `implement-feature` (feature workflow)
-- ✅ `create-pr` (PR creation guidance)
-
-**For all projects with ticket management:**
-- ✅ `read-ticket` (with appropriate override from Phase 1 confirmation)
-
-**Always recommended:**
-- ✅ `coding-principles` (universal coding standards)
-- ✅ `create-pr` (PR workflow)
-
-#### Present Skills Marketplace
-
-Show a customized marketplace view:
-
+### Explication préalable
 ```
-🎯 **Recommended Components for [Detected Stack]**
+🎯 **Phase 3 — Composants recommandés**
 
-**Essential Skills (strongly recommended):**
-📦 coding-principles — Core coding standards and principles
-📦 testing-tdd — Test-driven development for [detected test frameworks]
-📦 implement-feature — Structured feature implementation workflow
+Avant de vous montrer les recommandations, laissez-moi vous expliquer ce que sont les "composants". Ce sont des modules que vous pouvez m'ajouter pour enrichir mes capacités.
 
-**For your ticket system ([confirmed system]):**
-📦 read-ticket — Ticket reading with [jira/linear/azure-devops] integration
+Pensez à moi comme un développeur que vous formez pour votre équipe. Les composants, ce sont les formations, les checklists, les procédures et les accès que vous me donnez pour être efficace.
 
-**Additional useful skills:**
-📦 security-review — Security patterns for [detected frameworks]
-📦 create-pr — Pull request creation and review guidance
-
-**Recommended recipes for [Detected Stack]:**
-📦 development/us-to-pr — Full ticket-to-PR workflow (with checkpoints)
-📦 development/bugfix — Structured bug fixing process
-📦 review/pr-review — Code review workflow
-
-**Useful hooks for [confirmed system]:**
-📦 [jira-sync/linear-sync] — Sync workflow status to your ticket system
-📦 slack-notify — Send notifications to team channels
-📦 update-project-board — Keep GitHub project boards in sync
-
-**What would you like to install?**
-- Type 'all essential' to install recommended essentials
-- Type 'all recommended' to install skills + common recipes/hooks
-- Type individual component names to install specific ones  
-- Type 'browse' to see full marketplace
-- Type 'skip' to proceed without additional components (you can install later)
+Je vais vous présenter ça en deux temps pour ne pas vous submerger.
 ```
 
-#### Interactive Selection Process
+### Section éducative — Palier 1 : Les basiques
+**Always present this section FIRST. This is mandatory.**
 
-1. **Let the developer choose** which components to install (skills, recipes, hooks)
+```
+Explain two basic component types:
+- **Skill**: a practice guide I follow (like an internal wiki). Example: coding-principles makes me systematic about DRY/KISS/SOLID. Without it I code well, with it I'm rigorous.
+- **Hook**: an automatic check at key moments (like a git hook). Example: pre-commit-check catches secrets and broken tests before each commit.
+- **Key difference**: a skill influences HOW I work; a hook verifies THE RESULT.
+Then present recommended skills and hooks from the catalog.
+```
+
+Present the skills and hooks recommendations from the catalog, then:
+
+```
+Voici les skills et hooks que je recommande pour votre projet :
+
+**🧠 Skills essentiels (fortement recommandés) :**
+📦 coding-principles — Principes de code universels (DRY, KISS, SOLID)
+📦 test-driven-development — Développement piloté par les tests
+📦 implement-feature — Workflow structuré d'implémentation de features
+📦 verification-before-completion — Vérification avant de déclarer un travail terminé
+
+**🧠 Skills supplémentaires :**
+📦 create-pr — Guide de création de pull requests
+📦 security-review — Revue de sécurité pour {{frameworks_detectes}}
+📦 systematic-debugging — Débogage méthodique en 4 phases
+
+**🪝 Hooks recommandés :**
+📦 pre-commit-check — Vérifie lint, tests et secrets avant chaque commit
+📦 dependency-check — Vérifie les dépendances obsolètes ou vulnérables
+📦 changelog-update — Met à jour le CHANGELOG automatiquement
+
+Des questions sur ces composants avant qu'on passe à la suite ?
+```
+
+### Section éducative — Palier 2 : Les composants avancés
+**Present this section only AFTER the user has acknowledged Palier 1.**
+
+```
+Explain advanced component types:
+- **Agent**: a specialized expert hat I can wear. Example: architect agent analyzes patterns, security-auditor does OWASP audits.
+- **Recipe**: a full end-to-end workflow with validation checkpoints. Example: us-to-pr goes from ticket to PR step by step.
+- **Tool**: concrete access I'm given (GitHub, terminal, web). Without tools I can only talk, with them I act.
+- **Bundle**: your current starter kit — a pre-configured set of components.
+- **Key difference**: skill = continuous guidance, recipe = one-time procedure for a specific task.
+Then present recommended agents and recipes from the catalog.
+```
+
+Present the agents and recipes recommendations:
+
+```
+**🤖 Agents disponibles :**
+📦 code-reviewer — Revue de code contre le plan et les standards
+📦 architect — Analyse d'architecture et proposition de patterns
+📦 quality-guardian — Audit de qualité (complexité, duplication, dette, couverture)
+📦 security-auditor — Audit de sécurité (OWASP, injections, secrets, dépendances)
+
+**📋 Recipes recommandées :**
+📦 development/us-to-pr — Du ticket à la PR, étape par étape (avec points de contrôle)
+📦 development/bugfix — Workflow structuré de correction de bugs
+📦 review/pr-review — Revue de code complète
+```
+
+**IMPORTANT:** Only recommend components that actually exist in the catalog. The lists above are examples of what might be available — always verify against the actual catalog before presenting.
+
+### Choix d'installation — Avec recommandation forte
+
+```
+Recommend "all essential" as default (basic skills only, nothing intrusive). Remind everything is uninstallable. Options: "all essential" (recommended), "all recommended" (full set), "browse" (explore), component name (individual), "skip" (later).
+```
+
+### Interactive Selection Process
+
+1. **Let the developer choose** which components to install (skills, recipes, hooks, agents)
 2. For each selected component:
-   - Use the catalog-browser installation flow (unified for all component types)
+   - Use the `catalog-browser` skill to install. If `catalog-browser` is not available, read component files directly from the framework directory structure and manually add them to config.
    - Add to `.agent/config.json` in appropriate section with `source: "framework"` and calculated hash
    - Provide brief description of what the component provides
 3. **Handle overrides** correctly:
-   - If `read-ticket` is selected, use the override determined in Phase 1
+   - If a component with overrides is selected (e.g., `read-ticket`), use the override determined in Phase 1 (the ticket system the developer confirmed).
    - Store override in config: `"overrides": { "read-ticket": "jira" }`
 4. **Smart recommendations** based on selections:
    - If `implement-feature` skill is selected, suggest `development/us-to-pr` recipe
    - If ticket system is Jira, suggest `jira-sync` hook
    - If team collaboration is detected, suggest `slack-notify` hook
-5. **Regenerate agent files** after all selections
+5. **Regenerate agent files:** After all selections, run the catalog-browser's regeneration flow to update the agent's active configuration files from the installed components. If catalog-browser is unavailable, manually copy component files to the agent directory.
 6. **Confirm installation summary**
 
-#### Installation Summary
+### Installation Summary
 
 ```
-✅ **Component Installation Complete**
+✅ **Installation terminée !**
 
-**Installed skills:**
-- coding-principles (framework)
-- testing-tdd (framework) 
-- implement-feature (framework)
-- read-ticket (framework, jira override)
+Voici ce qui a été installé :
 
-**Installed recipes:**
-- development/us-to-pr (framework)
-- development/bugfix (framework)
+**🧠 Skills :** {{liste_des_skills_installes}}
+**📋 Recipes :** {{liste_des_recipes_installees}}
+**🤖 Agents :** {{liste_des_agents_installes}}
+**🪝 Hooks :** {{liste_des_hooks_installes}}
 
-**Installed hooks:**
-- jira-sync (framework)
-- slack-notify (framework)
+**Tout est désinstallable.** Si un composant vous gêne ou ne vous convient pas, demandez-moi de le retirer.
 
-**Configuration updated:**
-- Added 4 skills to .agent/config.json
-- Added 2 recipes to .agent/config.json
-- Added 2 hooks to .agent/config.json
-- Set read-ticket override: jira
-- All components ready for Phase 3
+**Où vivent ces fichiers ?**
+Voici la structure de votre dossier `.agent/` :
+```
+.agent/
+  config.json    — La configuration principale (stack, composants, overrides)
+  docs/          — La documentation du projet (que j'utilise à chaque interaction)
+  skills/        — Les skills installés (fichiers texte lisibles et modifiables)
+  hooks/         — Les hooks actifs
+```
+Vous pouvez ouvrir et lire n'importe lequel de ces fichiers — ce sont des fichiers texte, pas de la magie !
 
-**Next:** Project documentation setup
+Prochaine étape : Documentation du projet
 ```
 
-#### Skip Option
+### Skip Option
 
 If developer chooses to skip:
 ```
-⏭️ **Skipped Component Selection**
+⏭️ **Sélection de composants ignorée**
 
-You can install components later using the catalog browser:
-- Ask your agent to "browse components" or "show marketplace"
-- Use the `catalog-browser` skill anytime to install skills, recipes, or hooks
-- Or run `adf generate --agent [your-agent]` after manual config edits
+Pas de souci ! Vous pourrez installer des composants à tout moment :
+- Demandez-moi de "parcourir le marketplace" ou "montrer les composants disponibles"
+- J'utiliserai le catalogue pour vous présenter les options
+- Et tout est désinstallable, donc aucun risque à essayer.
 
-**Next:** Project documentation setup with minimal component set
+Prochaine étape : Documentation du projet
 ```
 
-**Important:** This phase should integrate seamlessly with the catalog-browser skill. Use the same installation mechanisms and configuration patterns for all component types (skills, recipes, hooks).
+**Important:** This phase should integrate seamlessly with the catalog-browser skill. Use the same installation mechanisms and configuration patterns for all component types (skills, recipes, hooks, agents).
 
-## Phase 3: Project Documentation Setup
+After user confirmation, update config: `"onboardingPhase": 3`
+
+---
+
+## Phase 4 : Documentation du projet
+
+### Explication préalable
+```
+Explain: you'll create a knowledge base about the project (architecture, code structure, conventions). These docs evolve over time — you'll help update them, no manual editing needed.
+```
+
+### Choix du mode de revue
+```
+Deux options pour cette phase :
+
+📋 **Revue détaillée** — On fait un document à la fois, en profondeur. Je vous montre chaque brouillon, vous validez, on corrige si besoin. C'est plus long mais plus précis. (Recommandé pour les projets complexes)
+
+⚡ **Revue rapide** — Je génère tous les documents d'un coup, vous les parcourez, et on corrige ce qui ne va pas. Plus rapide, et vous pourrez toujours affiner plus tard.
+
+Quelle approche préférez-vous ?
+```
 
 ### Analyze Current Documentation
 Check for these files in `.agent/docs/`:
-- `ARCHITECTURE.md` - System architecture overview
-- `CODEBASE.md` - Code organization and structure
-- `DATABASE.md` - Database schema and setup
-- `API.md` - API endpoints and contracts
-- `CONVENTIONS.md` - Team coding conventions
+- `ARCHITECTURE.md` — System architecture overview
+- `CODEBASE.md` — Code organization and structure
+- `DATABASE.md` — Database schema and setup
+- `API.md` — API endpoints and contracts
+- `CONVENTIONS.md` — Team coding conventions
+
+**Additional documents — generated if relevant detections were made in Phase 1:**
+- `DEPLOYMENT.md` — If Docker, Kubernetes, CI/CD pipelines detected
+- `TESTING.md` — If test frameworks detected (Jest, JUnit, pytest, etc.)
+- `SECURITY.md` — If auth/OAuth/security configurations detected
+- `INFRASTRUCTURE.md` — If IaC tools detected (Terraform, Pulumi, CloudFormation, etc.)
 
 ### Intelligent Documentation Generation
-For each missing document, **DO NOT** copy empty templates. Instead:
+For each applicable document, **DO NOT** copy empty templates. Instead:
 
 **For ARCHITECTURE.md:**
 - Scan for architectural patterns (MVC, microservices, layered, etc.)
@@ -296,34 +407,77 @@ For each missing document, **DO NOT** copy empty templates. Instead:
 - Look for linting configs (.eslintrc, checkstyle.xml, etc.)
 - Document what you observe as existing conventions
 
-### Interactive Documentation Creation
+**For DEPLOYMENT.md:**
+- Document Docker setup, docker-compose services
+- Document CI/CD pipeline (GitHub Actions, GitLab CI, Jenkins, etc.)
+- Document deployment environments if detectable
 
-**This phase is a CONVERSATION, not a batch job. The documentation is the foundation for everything the agent does next — both you and the developer must be fully aligned.**
+**For TESTING.md:**
+- Document test frameworks and configuration
+- Document test commands and coverage setup
+- Document test file organization
+
+**For SECURITY.md:**
+- Document authentication setup (OAuth, JWT, etc.)
+- Document authorization patterns
+- Document secrets management approach
+
+**For INFRASTRUCTURE.md:**
+- Document IaC setup (Terraform, Pulumi, etc.)
+- Document cloud resources if detectable
+- Document environment configurations
+
+### New Project Workflow
+**If `isNewProject` is true in `.agent/config.json`:**
+
+```
+🆕 **Projet nouveau — Brainstorming de départ**
+
+Votre projet est nouveau, donc il n'y a pas encore de code à analyser. Pas de problème — on va créer la documentation à partir d'une conversation !
+
+Parlons de votre projet :
+- **Quel type d'application** voulez-vous créer ? (web app, API, mobile, CLI, etc.)
+- **Quelle stack** avez-vous en tête ? (ou voulez-vous des recommandations ?)
+- **Qui sont les utilisateurs** ? (développeurs, clients, interne, public)
+- **Quelles sont les fonctionnalités principales** ?
+
+💡 Si vous avez un skill de brainstorming installé, je peux l'utiliser pour structurer cette réflexion de manière plus approfondie. Voulez-vous essayer ?
+
+À partir de vos réponses, je créerai une première version de la documentation qui servira de fondation pour votre projet.
+```
+
+Generate documentation based on the conversation rather than code analysis.
+
+### Interactive Documentation Creation — Detailed Mode
+
+**This mode is a CONVERSATION, not a batch job. The documentation is the foundation for everything the agent does next — both you and the developer must be fully aligned.**
 
 #### Step 1: Present the documentation plan
 Before generating anything, present an overview:
 
 ```
-📚 **Documentation Plan**
+📚 **Plan de documentation**
 
-Based on your project, here's what I recommend:
+Voici les documents que je recommande pour votre projet :
 
-**To generate:**
-- ARCHITECTURE.md — [brief description of what you'll document]
-- CODEBASE.md — [brief description]
-- CONVENTIONS.md — [brief description]
+**À générer :**
+- ARCHITECTURE.md — {{description_de_ce_qui_sera_documente}}
+- CODEBASE.md — {{description}}
+- CONVENTIONS.md — {{description}}
 
-**Not applicable (skipping):**
-- DATABASE.md — No database detected
-- API.md — No HTTP API detected
+**Non applicable (on passe) :**
+- DATABASE.md — Pas de base de données détectée
+- API.md — Pas d'API HTTP détectée
 
-**Do you agree with this plan?**
-- Want to add a document I didn't mention? (e.g., DEPLOYMENT.md, TESTING.md, SECURITY.md)
-- Want to skip one I suggested?
-- Want to rename or restructure anything?
+**Documents supplémentaires détectés :**
+- DEPLOYMENT.md — Docker et GitHub Actions détectés
+- TESTING.md — {{framework_test}} détecté
+
+**Êtes-vous d'accord avec ce plan ?**
+- Voulez-vous ajouter un document que je n'ai pas mentionné ?
+- Voulez-vous en retirer un ?
+- D'autres questions ?
 ```
-
-Wait for the developer to validate the plan. They might want additional documents specific to their project.
 
 #### Step 2: Generate and review ONE document at a time
 For each document:
@@ -332,44 +486,91 @@ For each document:
 3. Ask explicitly:
 
 ```
-📝 **[FILENAME] — Draft**
+📝 **{{FILENAME}} — Brouillon**
 
-[Full generated content]
+{{full_generated_content}}
 
 ---
-**Review this document:**
-- Is the content accurate?
-- Anything missing or incorrect?
-- Want me to add, remove, or rewrite sections?
+**Revue de ce document :**
+- Le contenu est-il correct ?
+- Y a-t-il des éléments manquants ou incorrects ?
+- Voulez-vous que j'ajoute, supprime ou réécrive des sections ?
 
-Once you're satisfied, I'll save it and move to the next document.
+Quand vous êtes satisfait, je l'enregistre et on passe au suivant.
 ```
 
 4. **Iterate** — if the developer wants changes, make them and show the updated version
 5. Only move to the next document when the developer explicitly approves
 
-#### Step 3: Final documentation review
-After all documents are created:
+### Interactive Documentation Creation — Quick Mode
+
+1. Generate ALL applicable documents at once
+2. Present a summary of each document with key sections
+3. Ask:
 
 ```
-📋 **Documentation Summary**
+📝 **Documents générés**
 
-Here's what we've created:
-- ✅ ARCHITECTURE.md — [one-line summary]
-- ✅ CODEBASE.md — [one-line summary]
-- ✅ CONVENTIONS.md — [one-line summary]
-- ⏭ DATABASE.md — Skipped (not applicable)
-- ⏭ API.md — Skipped (not applicable)
+J'ai créé les documents suivants :
+- ARCHITECTURE.md — {{resume_en_2_lignes}}
+- CODEBASE.md — {{resume_en_2_lignes}}
+- CONVENTIONS.md — {{resume_en_2_lignes}}
 
-**This documentation will be the reference for all agent operations on this project.**
-Every skill and recipe will use these docs to understand your codebase, conventions, and architecture.
+Voulez-vous voir le contenu complet d'un document en particulier ?
+Y a-t-il des corrections évidentes à faire ?
 
-Is everything correct? Any final changes before we lock this in and move to Phase 4?
+On pourra toujours les affiner plus tard — ces documents sont vivants.
 ```
 
-**CRITICAL: Do NOT rush through this phase. Do NOT batch-create all docs at once. The quality of this documentation directly determines the quality of every future agent interaction with this project.**
+### Step 3: Final documentation review
+After all documents are created (both modes):
 
-## Phase 4: Configuration Overrides
+```
+📋 **Récapitulatif de la documentation**
+
+Voici ce qu'on a créé ensemble :
+- ✅ ARCHITECTURE.md — {{resume_en_une_ligne}}
+- ✅ CODEBASE.md — {{resume_en_une_ligne}}
+- ✅ CONVENTIONS.md — {{resume_en_une_ligne}}
+- ✅ DEPLOYMENT.md — {{resume_en_une_ligne}}
+- ⏭ DATABASE.md — Non applicable
+- ⏭ API.md — Non applicable
+
+**Cette documentation sera ma référence pour toutes les interactions futures sur ce projet.**
+Chaque skill, recipe et agent l'utilisera pour comprendre votre code, vos conventions et votre architecture.
+
+Tout est correct ? Des modifications de dernière minute avant de passer à la suite ?
+```
+
+**CRITICAL: Do NOT rush through this phase. The quality of this documentation directly determines the quality of every future agent interaction with this project.**
+
+After user confirmation, update config: `"onboardingPhase": 4`
+
+---
+
+## Phase 5 : Personnalisation de la configuration
+
+### Condition d'exécution
+**Skip this phase if ALL of these are true:**
+- No ticket management system was confirmed in Phase 1
+- No database-specific override is needed
+- No technology-specific overrides were identified
+
+If skipping:
+```
+⏭️ Pas de personnalisation nécessaire — on passe directement à la finalisation.
+```
+
+Then jump directly to Phase 6.
+
+### Explication préalable (if overrides are needed)
+```
+⚙️ **Phase 5 — Personnalisation de la configuration**
+
+Les "overrides" (ou personnalisations), ce sont des réglages qui adaptent le comportement de certains composants à votre projet spécifique. Par exemple, si vous utilisez Jira, je dois le savoir pour adapter la lecture des tickets.
+
+Voici ce que je propose de configurer :
+```
 
 ### Analyze and Propose Overrides
 Based on your detections, propose appropriate overrides for `.agent/config.json`:
@@ -386,25 +587,30 @@ Based on your detections, propose appropriate overrides for `.agent/config.json`
 - Add any stack-specific configurations based on what you detected
 
 ### Update Configuration
-Show the developer what overrides you want to add:
+Show the developer what overrides you want to add, explaining each one:
 
 ```
-⚙️  **Configuration Updates**
+⚙️ **Personnalisations proposées**
 
-I'll add these overrides to `.agent/config.json`:
+Je vais ajouter ces réglages à `.agent/config.json` :
 
 {
   "overrides": {
-    "read-ticket": "jira",
-    "database": "postgresql"
+    "read-ticket": "{{systeme_confirme}}"
   }
 }
 
-These overrides customize the agent behavior for your detected stack.
-Proceed? (y/n)
+Concrètement, ça signifie :
+- **read-ticket: {{systeme}}** → quand je lis un ticket, j'utiliserai le format et l'API de {{systeme}} au lieu du format par défaut.
+
+On procède ? (oui/non)
 ```
 
-## Phase 5: Finalization
+After user confirmation, update config: `"onboardingPhase": 5`
+
+---
+
+## Phase 6 : Conclusion et guide de démarrage
 
 ### Mark Onboarding Complete
 Update `.agent/config.json` with:
@@ -414,54 +620,69 @@ Update `.agent/config.json` with:
   "onboardedAt": "[ISO-8601 timestamp]"
 }
 ```
+Remove `onboardingPhase` and `isNewProject` from config (no longer needed).
 
 ### Summary Report
-Provide a comprehensive summary:
 
 ```
-🎉 **Onboarding Complete!**
+🎉 **Onboarding terminé !**
 
-**Project Configuration:**
-- Stack: [detected stack]
-- Bundle: [bundle name]
-- Documentation: [X/5 files created]
-- Overrides: [list applied overrides]
+**Configuration du projet :**
+- Stack : {{stack_detectee}}
+- Bundle : {{nom_du_bundle}}
+- Documentation : {{X}} fichiers créés
+- Personnalisations : {{liste_des_overrides_appliques}}
+- Composants installés : {{nombre_total}}
 
-**What's Ready:**
-- ✅ Agent configuration
-- ✅ Project documentation
-- ✅ Tool dependencies verified
+**Ce qui est prêt :**
+- ✅ Configuration de l'agent
+- ✅ Documentation du projet
+- ✅ Outils vérifiés
+- ✅ Composants installés
 
-**Manual Steps Required:**
-- [ ] Configure JIRA_TOKEN secret in GitHub (if applicable)
-- [ ] Install missing CLI tools: [list]
-- [ ] Set up MCP tools: [list]
-
-**Next Steps:**
-You can now use your agent for development tasks. The onboarding will not run again unless you remove the `onboarded` flag from `.agent/config.json`.
-
-Try running a recipe: `adf generate --agent copilot --bundle [your-bundle]`
+**Actions manuelles restantes :**
+- [ ] {{liste_des_outils_a_installer_ou_configurer_manuellement}}
 ```
 
-## Important Behaviors
+### Getting Started — Adapted to Installed Components
 
-### Hard Gates
-- **DO NOT** start coding or implementing features during onboarding
-- **DO NOT** create pull requests or make code changes
-- **ONLY** create configuration files and documentation
+**Present a "Getting Started" section tailored to what was actually installed. If nothing was installed (user chose "skip" in Phase 3), present only the marketplace/help section.**
 
-### Conversation Style
-- Ask questions when detection is unclear
-- Show previews before creating files
-- Wait for confirmations on significant actions
-- Explain the reasoning behind your suggestions
+```
+For each installed component, provide ONE concrete trigger phrase the user can use. Examples:
+- implement-feature: "Tell me 'implement feature X' or give me a ticket link"
+- us-to-pr: "Give me a ticket number like 'PROJ-123'"
+- code-reviewer: "Ask me 'review my code' after implementing"
+- bugfix: "Describe a bug or give me a bug ticket"
+- architect: "Ask 'analyze the architecture' for patterns and trade-offs"
 
-### Error Handling
-- If bundle file is missing or invalid, explain the issue clearly
-- If tools are missing, provide specific installation steps
-- If directories don't exist, create them as needed
+Always end with: how to browse the marketplace, and an invitation to ask any question.
+```
 
-### Skip Conditions
-- Skip entirely if `config.onboarded === true`
-- Skip phases if equivalent work was already done
-- Detect partial completion and resume from appropriate phase
+### Workflow quotidien — Vision concrète
+```
+📅 **À quoi ressemble une journée typique avec moi ?**
+
+1. Vous ouvrez un ticket ou identifiez un besoin
+2. Vous me le décrivez — j'analyse le besoin et propose un plan
+3. On implémente ensemble, étape par étape, avec des validations
+4. Les hooks vérifient automatiquement la qualité avant chaque commit
+5. Je crée la PR avec la bonne description et les bons labels
+
+Bien sûr, vous pouvez aussi me poser des questions ponctuelles, me demander d'expliquer du code, de refactorer, de débugger... Je m'adapte à votre besoin du moment.
+```
+
+### Quick Win — Exercice pratique
+```
+🎓 **Essayons ensemble !**
+
+L'onboarding est terminé. Avant de se quitter, voulez-vous faire un petit essai pour voir comment ça fonctionne en pratique ?
+
+Quelques idées :
+- Donnez-moi un fichier de votre projet et demandez-moi de l'expliquer
+- Posez-moi une question sur votre architecture
+- Décrivez une petite tâche à faire
+
+Ça ne prendra qu'une minute et vous verrez concrètement comment on travaille ensemble. Sinon, on peut s'arrêter là — vous savez où me trouver !
+```
+

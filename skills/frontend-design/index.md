@@ -1,4 +1,5 @@
 ---
+hard_gate: "Do NOT start coding UI before establishing a design direction (typography, color, layout intent). Check for existing design systems or component libraries in the project first."
 ---
 
 # Frontend Design

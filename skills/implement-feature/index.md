@@ -44,8 +44,9 @@ Follow a consistent implementation workflow:
 - Summarize changes in the PR.
 - Link to the originating ticket.
 
-## Hard Gate
-- Do NOT deviate from the approved plan without asking first.
-- Do not refactor unrelated code.
-- Do not add features not in the plan.
-- Do not commit or push without explicit user approval.
+## Related Components
+- **Before starting**: Read project docs from `.agent/docs/` (ARCHITECTURE.md, CODEBASE.md, CONVENTIONS.md)
+- **For test creation**: Follow `test-driven-development` skill (RED-GREEN-REFACTOR cycle)
+- **Before claiming done**: Apply `verification-before-completion` gate
+- **For PR creation**: Hand off to `create-pr` skill
+- **If blocked**: Switch to `systematic-debugging` workflow

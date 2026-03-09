@@ -10,10 +10,10 @@ permissions:
   issues: write
   pull-requests: write
 imports:
-  - ../../../skills/coding-principles.md
-  - ../../../skills/testing-tdd.md
-  - ../../../skills/implement-feature.md
-  - ../../../skills/create-pr.md
+  - ../../../skills/coding-principles/index.md
+  - ../../../skills/test-driven-development/index.md
+  - ../../../skills/implement-feature/index.md
+  - ../../../skills/create-pr/index.md
 tools:
   github:
     toolsets: [repos, issues, pull_requests]

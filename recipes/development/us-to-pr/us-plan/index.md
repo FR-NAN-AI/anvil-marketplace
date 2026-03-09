@@ -9,8 +9,8 @@ permissions:
   contents: read
   issues: write
 imports:
-  - ../../../skills/coding-principles.md
-  - ../../../skills/testing-tdd.md
+  - ../../../skills/coding-principles/index.md
+  - ../../../skills/test-driven-development/index.md
 tools:
   github:
     toolsets: [repos, issues]

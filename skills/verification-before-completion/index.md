@@ -69,27 +69,8 @@ CORRECT:  Re-read plan → Create checklist → Verify each item → Report
 WRONG:    "Tests pass, so the feature is complete"
 ```
 
-## Common Rationalizations
+## Related Components
+- **Testing**: Works with `test-driven-development` — verify RED then GREEN
+- **Feature completion**: Applied at the end of `implement-feature` before hand-off
+- **PR creation**: Applied before `create-pr` to ensure all checks pass
 
-| Excuse | Reality |
-|--------|---------|
-| "Should work now" | RUN the verification |
-| "I'm confident" | Confidence ≠ evidence |
-| "Just this once" | No exceptions |
-| "Linter passed" | Linter ≠ tests ≠ build |
-| "Partial check is enough" | Partial proves nothing |
-
-## When To Apply
-
-**ALWAYS before:**
-- Any completion claim
-- Committing code
-- Creating PRs
-- Moving to next task
-- Reporting status to the developer
-
-## The Bottom Line
-
-Run the command. Read the output. THEN claim the result.
-
-No shortcuts. No exceptions.

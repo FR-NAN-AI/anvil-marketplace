@@ -62,12 +62,8 @@ Use these principles for all changes unless a repository standard conflicts.
 - Measure before optimizing. Prefer algorithmic wins over micro-optimizations.
 - Avoid unnecessary work in hot paths (I/O, loops, serialization).
 
-## Security
-
-- Never hardcode secrets, tokens, or credentials.
-- Sanitize user input at boundaries to prevent injection (SQL, XSS, command).
-- Use parameterized queries for database access.
-- Apply least privilege for API keys and service accounts.
+### Security
+Apply the `security-review` skill checklist for any security-sensitive changes. Key rules: no hardcoded secrets, validate external inputs, use parameterized queries.
 
 ## Documentation
 

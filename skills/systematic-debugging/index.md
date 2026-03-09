@@ -99,21 +99,8 @@ If you catch yourself thinking:
 
 **ALL of these mean: STOP. Return to Phase 1.**
 
-## Common Rationalizations
+## Related Components
+- **Test creation (Phase 4)**: Follow `test-driven-development` Bug Fix Workflow for creating regression tests
+- **Feature work**: Used by `implement-feature` when implementation is blocked
+- **Verification**: Apply `verification-before-completion` after the fix is applied
 
-| Excuse | Reality |
-|--------|---------|
-| "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast. |
-| "Emergency, no time for process" | Systematic debugging is FASTER than guessing. |
-| "Just try this first" | First fix sets the pattern. Do it right from the start. |
-| "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-| "One more fix attempt" (after 2+) | 3+ failures = possible architectural problem. |
-
-## Quick Reference
-
-| Phase | Key Activities | Success Criteria |
-|-------|---------------|------------------|
-| **1. Root Cause** | Read errors, reproduce, check changes, trace data | Understand WHAT and WHY |
-| **2. Pattern** | Find working examples, compare | Identify differences |
-| **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
-| **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |

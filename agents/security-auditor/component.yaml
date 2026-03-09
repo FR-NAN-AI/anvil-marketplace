@@ -9,6 +9,8 @@ targets:
     supported: true
   claude:
     supported: true
+    model: sonnet
+    tools: Read, Grep, Glob, Bash
   cursor:
     supported: true
 entry:

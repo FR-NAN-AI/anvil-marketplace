@@ -61,7 +61,7 @@ Type the name of any component to install it, or ask me about a specific one.
        "originalHash": "calculated-hash"
      }
      ```
-4. Run `adf generate --agent <current-agent>` to regenerate output files with hash tracking
+4. Run `anvil generate --agent <current-agent>` to regenerate output files with hash tracking
 5. Confirm installation
 
 **Example dialog:**
@@ -86,7 +86,7 @@ You can now use the security review guidance in your development workflow.
 2. Ask for confirmation: "Remove [component-name]? This will delete the local files. (y/n)"
 3. Remove from `.agent/config.json`
 4. Delete the generated files
-5. Run `adf generate` to clean up
+5. Run `anvil generate` to clean up
 6. Confirm removal
 
 ### 4. Component Information
@@ -142,7 +142,7 @@ This skill works with:
 - **catalog-browser**: This skill IS the catalog browser
 - **update-skills**: Complementary skill for updating existing components  
 - **onboarding**: Phase 2.5 skill selection uses this marketplace
-- **adf generate**: Called after installations to regenerate files
+- **anvil generate**: Called after installations to regenerate files
 
 ## Safety Guards
 
@@ -155,8 +155,8 @@ This skill works with:
 ## CLI Integration
 
 This skill can leverage the CLI commands:
-- `adf list` — to verify catalog consistency
-- `adf generate --agent <agent>` — to regenerate after changes
+- `anvil list` — to verify catalog consistency
+- `anvil generate --agent <agent>` — to regenerate after changes
 - Framework paths and bundle loading — to access catalog.yaml
 
 The skill should understand the project's current agent type from `.agent/config.json` and generate for the correct platform.

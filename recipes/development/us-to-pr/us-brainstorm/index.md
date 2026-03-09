@@ -6,8 +6,7 @@ engine: copilot
 permissions:
   contents: read
   issues: write
-imports:
-  - ../../../skills/read-ticket/base.md
+imports: []
 tools:
   github:
     toolsets: [repos, issues]

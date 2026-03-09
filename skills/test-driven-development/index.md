@@ -87,18 +87,6 @@ Keep all tests green. Don't add behavior during refactor.
 
 Next failing test for next behavior.
 
-## Common Rationalizations
-
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests passing immediately prove nothing. |
-| "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
-| "Deleting X hours of work is wasteful" | Sunk cost fallacy. Keeping unverified code is debt. |
-| "Need to explore first" | Fine. Throw away exploration, start with TDD. |
-| "TDD will slow me down" | TDD is faster than debugging. |
-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. |
-
 ## Red Flags — STOP and Start Over
 
 - Code written before test
@@ -140,3 +128,8 @@ Before marking work complete:
 - [ ] Output is clean (no errors, no warnings)
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and error paths covered
+
+## Related Components
+- **Verification**: Use `verification-before-completion` to confirm tests pass before claiming done
+- **Debugging**: If tests are hard to write, use `systematic-debugging` to understand the code first
+- **Feature workflow**: This skill is used by the `implement-feature` skill during the Validate phase

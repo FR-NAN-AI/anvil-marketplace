@@ -9,6 +9,9 @@ targets:
     supported: true
   claude:
     supported: true
+    model: sonnet
+    tools: Read, Grep, Glob, Bash
+    permissionMode: plan
   cursor:
     supported: true
 entry:

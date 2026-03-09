@@ -13,12 +13,10 @@ permissions:
   pull-requests: write
 
 imports:
-  - ../../skills/coding-principles.md
-  - ../../skills/testing-tdd.md
-  - ../../skills/read-ticket/base.md
-  - ../../skills/implement-feature.md
-  - ../../skills/create-pr.md
-  - ../../hooks/jira-sync.md
+  - ../../skills/coding-principles/index.md
+  - ../../skills/test-driven-development/index.md
+  - ../../skills/implement-feature/index.md
+  - ../../skills/create-pr/index.md
 
 tools:
   github:
