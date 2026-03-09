@@ -19,6 +19,7 @@ Generic, project-agnostic components that work with any tech stack.
 | `onboarding` | Intelligent project setup |
 | `anvil-cli-reference` | Complete anvil CLI reference |
 | `catalog-browser` | Browse and install marketplace components |
+| `frontend-design` | Distinctive, production-grade frontend interfaces |
 
 ### Recipes
 | Name | Description |

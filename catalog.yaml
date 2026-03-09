@@ -41,6 +41,10 @@ items:
     name: catalog-browser
     path: skills/catalog-browser
     description: Browse and install components from the marketplace
+  - type: skill
+    name: frontend-design
+    path: skills/frontend-design
+    description: Distinctive, production-grade frontend interfaces — avoid generic patterns
 
   # Agents
   - type: agent

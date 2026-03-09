@@ -12,6 +12,7 @@ components:
     - test-driven-development
     - systematic-debugging
     - verification-before-completion
+    - frontend-design
   recipes:
     - development/us-to-pr
     - development/bugfix
