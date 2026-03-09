@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: agent
+name: architect
+title: Technical Architect
+version: 0.1.0
+description: Analyzes architecture, proposes patterns, evaluates trade-offs, verifies SOLID principles
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

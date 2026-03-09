@@ -20,6 +20,10 @@ components:
   agents:
     - requirement-analyzer
     - task-executor
+    - code-reviewer
+    - architect
+    - quality-guardian
+    - security-auditor
   tools:
     - github-standard
     - bash-dev

@@ -33,6 +33,10 @@ Generic, project-agnostic components that work with any tech stack.
 |------|-------------|
 | `requirement-analyzer` | Analyzes tickets, produces structured briefs |
 | `task-executor` | Implements tasks, delivers tested changes |
+| `code-reviewer` | Reviews completed work against plan and standards |
+| `architect` | Analyzes architecture, proposes patterns, evaluates trade-offs |
+| `quality-guardian` | Audits quality — complexity, duplication, debt, coverage |
+| `security-auditor` | Security audit — OWASP, injections, secrets, dependencies |
 
 ### Tools
 | Name | Description |

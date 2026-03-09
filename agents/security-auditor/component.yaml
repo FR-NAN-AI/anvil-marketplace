@@ -1,0 +1,15 @@
+schema: anvil.component/v1
+type: agent
+name: security-auditor
+title: Security Auditor
+version: 0.1.0
+description: Security audit — OWASP top 10, injections, hardcoded secrets, vulnerable dependencies
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+entry:
+  file: index.md

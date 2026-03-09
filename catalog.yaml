@@ -51,6 +51,22 @@ items:
     name: task-executor
     path: agents/task-executor
     description: Implements tasks and delivers tested changes
+  - type: agent
+    name: code-reviewer
+    path: agents/code-reviewer
+    description: Reviews completed work against plan and coding standards
+  - type: agent
+    name: architect
+    path: agents/architect
+    description: Analyzes architecture, proposes patterns, evaluates trade-offs
+  - type: agent
+    name: quality-guardian
+    path: agents/quality-guardian
+    description: Audits code quality — complexity, duplication, debt, coverage
+  - type: agent
+    name: security-auditor
+    path: agents/security-auditor
+    description: Security audit — OWASP, injections, secrets, dependencies
 
   # Tools
   - type: tool
