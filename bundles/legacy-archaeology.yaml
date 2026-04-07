@@ -1,0 +1,26 @@
+name: legacy-archaeology
+description: Parachute une équipe sur un legacy opaque — produit un wiki documentaire complet et permet de le maintenir
+components:
+  skills:
+    # Socle pré-existant
+    - onboarding
+    - coding-principles
+    - systematic-debugging
+    - verification-before-completion
+    - anvil-cli-reference
+
+    # Vague 1 — cœur de la cartographie
+    - analyze-codebase-deep
+    - generate-project-wiki
+    - generate-runnable-readme
+
+    # Vague 2 (à ajouter) — git-archaeology, dependency-cartography
+    # Vague 3 (à ajouter) — wiki-as-context
+
+  agents:
+    - architect
+
+    # Vague 1
+    - legacy-cartographer
+
+    # Vague 2 (à ajouter) — feature-inventory, domain-extractor

@@ -14,12 +14,12 @@
 
 - **NEVER** start coding or implementing features during onboarding
 - **NEVER** create pull requests or make code changes
-- **ONLY** create configuration files (`.anvil/`) and documentation (`.anvil/docs/`)
+- **ONLY** create configuration files (`.anvil/`) and the project wiki (`.anvil/wiki/`)
 
 Examples:
 - WRONG: "I'll set up the project structure and create the initial files for you."
 - WRONG: Creating source code files, modifying existing code, running build commands.
-- RIGHT: Only creating files in `.anvil/docs/` and modifying `.anvil/config.json`.
+- RIGHT: Only creating files in `.anvil/wiki/` and modifying `.anvil/config.json`.
 
 ## Préambule
 
@@ -343,97 +343,80 @@ After user confirmation, update config: `"onboardingPhase": 3`
 
 ---
 
-## Phase 4 : Documentation du projet
+## Phase 4 : Génération du wiki documentaire
 
 ### Explication préalable
 ```
-Explain: you'll create a knowledge base about the project (architecture, code structure, conventions). These docs evolve over time — you'll help update them, no manual editing needed.
+Explain: you'll build a complete project knowledge base in .anvil/wiki/ — a navigable wiki with architecture, stack, conventions, operations, and known issues. The wiki is what every future AI session will read. Quality here determines everything downstream. Use the medical analogy: this is the diagnosis report shared with all future doctors.
 ```
 
-### Choix du mode de revue
+### Pre-condition — Bundle check
+
+Before doing anything in this phase, **check whether the bundle `legacy-archaeology` is installed**.
+
+- Read `.anvil/config.json` and inspect `components.skills` and `components.agents`
+- The bundle is considered **installed** if at minimum `legacy-cartographer` (agent), `analyze-codebase-deep`, `generate-project-wiki`, and `generate-runnable-readme` (skills) are present
+
+**Two paths only — no third:**
+
+#### Path A — Bundle installed → run the pipeline
+
+Proceed directly to "Pipeline execution" below.
+
+#### Path B — Bundle not installed → propose installation, no degraded mode
+
 ```
-Deux options pour cette phase :
+📚 **Phase 4 — Génération du wiki documentaire**
 
-📋 **Revue détaillée** — On fait un document à la fois, en profondeur. Je vous montre chaque brouillon, vous validez, on corrige si besoin. C'est plus long mais plus précis. (Recommandé pour les projets complexes)
+Pour cette phase, j'ai besoin du bundle `legacy-archaeology` qui contient les composants spécialisés pour analyser ton legacy en profondeur et produire un wiki structuré :
 
-⚡ **Revue rapide** — Je génère tous les documents d'un coup, vous les parcourez, et on corrige ce qui ne va pas. Plus rapide, et vous pourrez toujours affiner plus tard.
+- 🤖 **legacy-cartographer** (agent) — explore ta codebase et produit une cartographie sourcée
+- 🧠 **analyze-codebase-deep** (skill) — méthode d'analyse en 4 couches, optimisée coût IA
+- 🧠 **generate-project-wiki** (skill) — transforme la cartographie en wiki navigable, validé page par page
+- 🧠 **generate-runnable-readme** (skill) — produit un README "clone, install, run" testé avec toi
 
-Quelle approche préférez-vous ?
+Sans ces composants, je ne peux pas générer un wiki digne de ce nom — et un wiki bâclé serait pire que pas de wiki.
+
+Trois choix :
+
+1. **Oui, installe-les maintenant** → j'installe les composants un par un et on enchaîne sur la génération du wiki
+2. **Non, plus tard** → on saute cette phase et on passe à la suite. Tu pourras lancer la génération quand tu veux en me disant "génère le wiki"
+3. **Non, jamais** → on saute cette phase et je ne te reparlerai pas du wiki
+
+Que préfères-tu ?
 ```
 
-### Analyze Current Documentation
-Check for these files in `.anvil/docs/`:
-- `ARCHITECTURE.md` — System architecture overview
-- `CODEBASE.md` — Code organization and structure
-- `DATABASE.md` — Database schema and setup
-- `API.md` — API endpoints and contracts
-- `CONVENTIONS.md` — Team coding conventions
+**If user says yes (option 1):**
 
-**Additional documents — generated if relevant detections were made in Phase 1:**
-- `DEPLOYMENT.md` — If Docker, Kubernetes, CI/CD pipelines detected
-- `TESTING.md` — If test frameworks detected (Jest, JUnit, pytest, etc.)
-- `SECURITY.md` — If auth/OAuth/security configurations detected
-- `INFRASTRUCTURE.md` — If IaC tools detected (Terraform, Pulumi, CloudFormation, etc.)
+Install the components one by one using the existing CLI (the CLI does NOT yet support `anvil install bundle`):
 
-### Intelligent Documentation Generation
-For each applicable document, **DO NOT** copy empty templates. Instead:
+```bash
+anvil install agent legacy-cartographer
+anvil install skill analyze-codebase-deep
+anvil install skill generate-project-wiki
+anvil install skill generate-runnable-readme
+```
 
-**For ARCHITECTURE.md:**
-- Scan for architectural patterns (MVC, microservices, layered, etc.)
-- Look at folder structure to understand modules/components
-- Check for infrastructure files (docker-compose, kubernetes manifests)
-- Pre-fill with what you actually see in the codebase
+After each install, confirm success. If any install fails, stop and report the error to the user. Do not proceed to the pipeline with partial installation.
 
-**For CODEBASE.md:**
-- Analyze folder structure and document it
-- Identify main entry points
-- Document build/run commands based on detected tools
-- List key directories and their purposes
+Then proceed to "Pipeline execution" below.
 
-**For DATABASE.md:**
-- If database detected, scan schema files or migrations
-- Document connection configuration
-- List main entities/tables if you can identify them
-- Include setup/migration commands
+**If user says option 2 or 3:**
 
-**For API.md:**
-- Scan for API controllers/routes
-- Look for OpenAPI/Swagger files
-- Document authentication methods if visible
-- List main endpoints you can identify
+Skip directly to Phase 5. Set `"onboardingPhase": 4` in config without generating any wiki content. The `.anvil/wiki/` directory remains empty.
 
-**For CONVENTIONS.md:**
-- Check existing code for patterns (naming, formatting)
-- Look for linting configs (.eslintrc, checkstyle.xml, etc.)
-- Document what you observe as existing conventions
-
-**For DEPLOYMENT.md:**
-- Document Docker setup, docker-compose services
-- Document CI/CD pipeline (GitHub Actions, GitLab CI, Jenkins, etc.)
-- Document deployment environments if detectable
-
-**For TESTING.md:**
-- Document test frameworks and configuration
-- Document test commands and coverage setup
-- Document test file organization
-
-**For SECURITY.md:**
-- Document authentication setup (OAuth, JWT, etc.)
-- Document authorization patterns
-- Document secrets management approach
-
-**For INFRASTRUCTURE.md:**
-- Document IaC setup (Terraform, Pulumi, etc.)
-- Document cloud resources if detectable
-- Document environment configurations
+If option 3, also set `"wikiOptOut": true` in `.anvil/config.json` so future sessions know not to suggest the wiki again.
 
 ### New Project Workflow
+
 **If `isNewProject` is true in `.anvil/config.json`:**
+
+The legacy archaeology pipeline does NOT apply — there is no code to analyze. Use the existing brainstorming flow instead:
 
 ```
 🆕 **Projet nouveau — Brainstorming de départ**
 
-Votre projet est nouveau, donc il n'y a pas encore de code à analyser. Pas de problème — on va créer la documentation à partir d'une conversation !
+Votre projet est nouveau, donc il n'y a pas encore de code à cartographier. Pas de problème — on va construire la documentation à partir d'une conversation.
 
 Parlons de votre projet :
 - **Quel type d'application** voulez-vous créer ? (web app, API, mobile, CLI, etc.)
@@ -441,108 +424,72 @@ Parlons de votre projet :
 - **Qui sont les utilisateurs** ? (développeurs, clients, interne, public)
 - **Quelles sont les fonctionnalités principales** ?
 
-💡 Si vous avez un skill de brainstorming installé, je peux l'utiliser pour structurer cette réflexion de manière plus approfondie. Voulez-vous essayer ?
+💡 Si vous avez un skill de brainstorming installé, je peux l'utiliser pour structurer cette réflexion. Sinon, on fait simple en dialogue libre.
 
-À partir de vos réponses, je créerai une première version de la documentation qui servira de fondation pour votre projet.
+À partir de vos réponses, je créerai une première version de `.anvil/wiki/` qui servira de fondation pour votre projet.
 ```
 
-Generate documentation based on the conversation rather than code analysis.
+Then create a minimal `.anvil/wiki/index.md` from the conversation, without the full pipeline. Skip directly to Phase 5 after user confirmation.
 
-### Interactive Documentation Creation — Detailed Mode
+### Pipeline execution (only when bundle is installed and project is not new)
 
-**This mode is a CONVERSATION, not a batch job. The documentation is the foundation for everything the agent does next — both you and the developer must be fully aligned.**
+Execute the components in this exact order. Each step is a delegation to a specialized component — do not improvise.
 
-#### Step 1: Present the documentation plan
-Before generating anything, present an overview:
+**Step 1 — Cartography**
 
-```
-📚 **Plan de documentation**
+Invoke the `legacy-cartographer` agent. It will read the `analyze-codebase-deep` skill, run the 4-layer method, and produce `.anvil/wiki/.cartography.yaml`.
 
-Voici les documents que je recommande pour votre projet :
+Wait for it to complete. Read the warnings section of the YAML. If any warnings are critical (e.g. "shallow clone"), surface them to the user before proceeding.
 
-**À générer :**
-- ARCHITECTURE.md — {{description_de_ce_qui_sera_documente}}
-- CODEBASE.md — {{description}}
-- CONVENTIONS.md — {{description}}
+**Step 2 — Wiki generation**
 
-**Non applicable (on passe) :**
-- DATABASE.md — Pas de base de données détectée
-- API.md — Pas d'API HTTP détectée
-
-**Documents supplémentaires détectés :**
-- DEPLOYMENT.md — Docker et GitHub Actions détectés
-- TESTING.md — {{framework_test}} détecté
-
-**Êtes-vous d'accord avec ce plan ?**
-- Voulez-vous ajouter un document que je n'ai pas mentionné ?
-- Voulez-vous en retirer un ?
-- D'autres questions ?
-```
-
-#### Step 2: Generate and review ONE document at a time
-For each document:
-1. Generate a draft based on what you see in the codebase
-2. **Show the FULL content** to the developer (not just a summary)
-3. Ask explicitly:
+Invoke the `generate-project-wiki` skill. Pass through whatever review mode the user prefers — the skill itself will ask:
 
 ```
-📝 **{{FILENAME}} — Brouillon**
+Pour la génération du wiki, deux modes :
 
-{{full_generated_content}}
+📋 **Détaillé** — On fait une page à la fois. Je te montre chaque brouillon, tu valides, on corrige. C'est plus long mais c'est ton wiki, autant qu'il te ressemble. (Recommandé pour la première génération)
 
----
-**Revue de ce document :**
-- Le contenu est-il correct ?
-- Y a-t-il des éléments manquants ou incorrects ?
-- Voulez-vous que j'ajoute, supprime ou réécrive des sections ?
+⚡ **Rapide** — Je génère tout d'un coup, tu parcours, on corrige ce qui ne va pas.
 
-Quand vous êtes satisfait, je l'enregistre et on passe au suivant.
+Quel mode préfères-tu ?
 ```
 
-4. **Iterate** — if the developer wants changes, make them and show the updated version
-5. Only move to the next document when the developer explicitly approves
+The skill will then create the full `.anvil/wiki/` structure with numbered sections (01-getting-started through 08-known-issues), validating page by page in detailed mode or in batch in quick mode.
 
-### Interactive Documentation Creation — Quick Mode
+**Step 3 — Runnable README**
 
-1. Generate ALL applicable documents at once
-2. Present a summary of each document with key sections
-3. Ask:
+Invoke the `generate-runnable-readme` skill. It will produce `.anvil/wiki/01-getting-started/README.md`, mentally testing each command with the user.
 
-```
-📝 **Documents générés**
+This is the most interactive part — expect 5-10 minutes of back-and-forth where the user confirms commands, prerequisites, and known errors.
 
-J'ai créé les documents suivants :
-- ARCHITECTURE.md — {{resume_en_2_lignes}}
-- CODEBASE.md — {{resume_en_2_lignes}}
-- CONVENTIONS.md — {{resume_en_2_lignes}}
+**Step 4 — Final wiki review**
 
-Voulez-vous voir le contenu complet d'un document en particulier ?
-Y a-t-il des corrections évidentes à faire ?
-
-On pourra toujours les affiner plus tard — ces documents sont vivants.
-```
-
-### Step 3: Final documentation review
-After all documents are created (both modes):
+After all three components have run, present a summary:
 
 ```
-📋 **Récapitulatif de la documentation**
+📚 **Wiki généré**
 
-Voici ce qu'on a créé ensemble :
-- ✅ ARCHITECTURE.md — {{resume_en_une_ligne}}
-- ✅ CODEBASE.md — {{resume_en_une_ligne}}
-- ✅ CONVENTIONS.md — {{resume_en_une_ligne}}
-- ✅ DEPLOYMENT.md — {{resume_en_une_ligne}}
-- ⏭ DATABASE.md — Non applicable
-- ⏭ API.md — Non applicable
+Voici ce qui a été créé dans `.anvil/wiki/` :
 
-**Cette documentation sera ma référence pour toutes les interactions futures sur ce projet.**
-Chaque skill, recipe et agent l'utilisera pour comprendre votre code, vos conventions et votre architecture.
+- 📂 **index.md** — Portail d'entrée du wiki
+- 📂 **01-getting-started/** — README runnable validé avec toi
+- 📂 **02-architecture/** — {{nb}} pages sur l'architecture
+- 📂 **03-stack/** — Langages, frameworks, dépendances
+- 📂 **06-conventions/** — Conventions de code détectées
+- 📂 **07-operations/** — Build, deploy, environnements
+- 📂 **08-known-issues/** — {{nb}} marqueurs de dette technique trouvés
 
-Tout est correct ? Des modifications de dernière minute avant de passer à la suite ?
+**À noter :**
+- Les sections `04-features/` et `05-domain/` sont vides pour l'instant — elles seront enrichies en vague 2 du design (feature-inventory et domain-extractor)
+- Le fichier `.cartography.yaml` est la source structurée — ne le modifie pas à la main, il sert pour les rafraîchissements futurs
+
+**Cette doc est maintenant ma référence canonique pour tout travail futur sur ce projet.** Tous les agents IA qui interviendront sur ce repo liront le wiki avant d'agir.
+
+Une dernière revue avant qu'on passe à la suite ? Y a-t-il une page que tu veux corriger ou compléter ?
 ```
 
-**CRITICAL: Do NOT rush through this phase. The quality of this documentation directly determines the quality of every future agent interaction with this project.**
+**CRITICAL: Do NOT rush through this phase. The quality of the wiki directly determines the quality of every future agent interaction with this project.**
 
 After user confirmation, update config: `"onboardingPhase": 4`
 

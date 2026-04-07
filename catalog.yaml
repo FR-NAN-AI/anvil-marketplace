@@ -45,6 +45,18 @@ items:
     name: frontend-design
     path: skills/frontend-design
     description: Distinctive, production-grade frontend interfaces — avoid generic patterns
+  - type: skill
+    name: analyze-codebase-deep
+    path: skills/analyze-codebase-deep
+    description: 4-layer method to analyze a legacy codebase with minimal AI cost
+  - type: skill
+    name: generate-project-wiki
+    path: skills/generate-project-wiki
+    description: Transforms a cartography YAML into a navigable, sourced wiki under .anvil/wiki/
+  - type: skill
+    name: generate-runnable-readme
+    path: skills/generate-runnable-readme
+    description: Produces a clone-install-run README at .anvil/wiki/01-getting-started/, mentally tested with the user
 
   # Agents
   - type: agent
@@ -71,6 +83,10 @@ items:
     name: security-auditor
     path: agents/security-auditor
     description: Security audit — OWASP, injections, secrets, dependencies
+  - type: agent
+    name: legacy-cartographer
+    path: agents/legacy-cartographer
+    description: Explores opaque legacy codebases and produces a sourced cartography YAML
 
   # Hooks
   - type: hook
@@ -155,3 +171,7 @@ items:
     name: tech-lead
     path: bundles/tech-lead.yaml
     description: Tech lead bundle — quality, reviews, and process
+  - type: bundle
+    name: legacy-archaeology
+    path: bundles/legacy-archaeology.yaml
+    description: Parachute une équipe sur un legacy opaque — produit un wiki documentaire complet
