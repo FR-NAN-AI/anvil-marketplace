@@ -1,0 +1,5 @@
+# Every change to this repository must be reviewed by the listed owner(s).
+# Combined with branch protection on `main`, this enforces that only the
+# listed user(s) can approve pull requests targeting the default branch.
+
+* @alexandre-berriau
