@@ -42,8 +42,35 @@ After completing each phase, update `.anvil/config.json` with `"onboardingPhase"
 Commence par un accueil chaleureux. Explique ce qu'est l'onboarding (adapt tone and language to the user):
 
 ```
-Present a warm welcome that explains: (1) what onboarding is — "I'm learning about your project", (2) the 6 phases in a numbered list (analyze, tools, components, documentation, configuration, finalize), (3) resumability after interruption, (4) invitation to ask questions. End with "On commence ?"
+Present a warm welcome that explains: (1) what onboarding is — "I'm learning about your project", (2) the 7 phases in a numbered list starting at 0: 0. **Marketplace équipe** (optionnel) — ajouter un marketplace interne ; 1. analyze ; 2. tools ; 3. components ; 4. documentation ; 5. configuration ; 6. finalize, (3) resumability after interruption, (4) invitation to ask questions. End with "On commence ?"
 ```
+
+---
+
+## Phase 0 : Marketplace équipe ou entreprise (optionnel)
+
+Avant de démarrer l'onboarding, demande à l'utilisateur :
+
+> 🏢 **Avant de commencer**
+>
+> Ton équipe ou ta boîte a-t-elle un marketplace Anvil avec des composants
+> ou des prérequis spécifiques (sécurité, compliance, outils internes) ?
+>
+> - Si oui : donne-moi l'URL git ou le chemin local, je l'ajoute maintenant.
+> - Si tu ne sais pas ou si c'est un projet perso : réponds "skip", on fait
+>   l'onboarding standard.
+
+Si l'utilisateur fournit une URL ou un chemin :
+1. Exécute `anvil marketplace add <nom-lisible> --git <url>` (ou `--local <path>`
+   si c'est un chemin).
+2. Confirme le succès (vérifie l'exit code ; affiche un message si la sync
+   initiale a échoué et propose de continuer sans).
+3. Exécute `anvil marketplace sync <nom>` pour rapatrier le catalogue.
+
+Puis passe à Phase 1. Les phases suivantes tiendront automatiquement compte
+des composants du marketplace ajouté.
+
+Si l'utilisateur répond "skip" ou ne fournit rien : passe directement à Phase 1.
 
 ---
 
@@ -190,6 +217,22 @@ Based on what was confirmed in Phase 1, verify the tools needed for those choice
 Present tool status grouped by: CLI Tools (✅/❌ with version), MCP Connections (✅/⚠️). Ask if questions before continuing.
 ```
 
+### Extensions d'onboarding — prérequis
+
+Après les vérifications standards ci-dessus, exécute :
+
+```bash
+anvil catalog skill --tag onboarding-extension --json
+```
+
+Pour chaque entrée dont le frontmatter YAML inclut `onboarding-phase: prerequisites`
+(lis le fichier via son `path` dans le catalog), traite son contenu comme un
+ensemble de prérequis additionnels à vérifier. Présente-les à l'utilisateur
+regroupés par extension (utilise la `description` du catalog comme en-tête de
+groupe), puis exécute les vérifications décrites dans le skill.
+
+Si aucune extension ne matche cette phase, continue normalement.
+
 After user confirmation, update config: `"onboardingPhase": 2`
 
 ---
@@ -207,76 +250,116 @@ Pensez à moi comme un développeur que vous formez pour votre équipe. Les comp
 Je vais vous présenter ça en deux temps pour ne pas vous submerger.
 ```
 
+### Mandatory catalog query — source unique de vérité
+
+**Before presenting ANY recommendation, you MUST execute:**
+
+```bash
+anvil catalog --json
+```
+
+**The response is the ONLY source of truth for this phase.** Parse it as `{ ok: true, data: [...] }`. Each item in `data` has at minimum:
+- `type`: `"skill" | "hook" | "agent" | "recipe"` (plus others you ignore for this phase)
+- `name`: the component identifier
+- `marketplace`: which marketplace it came from
+- `description`: a short human-readable summary
+
+**Absolute rules:**
+- If a component is NOT in the `data` array, you do NOT mention it — not as a recommendation, not as an example, not at all.
+- You do NOT invent descriptions. You use the `description` field verbatim (translated to the user's language if needed, but not reworded for "marketing").
+- You do NOT add tags, badges, or "essential" markers that are not present in the catalog item itself.
+
+**If the command fails (non-zero exit) or `data` is an empty array:**
+
+```
+Aucun composant n'est visible dans les marketplaces configurés actuellement.
+
+Tu peux :
+1. **Ajouter un marketplace** avec `anvil marketplace add <nom> --git <url>` puis relancer cette phase
+2. **Passer l'installation** et y revenir plus tard — tu pourras toujours me demander de parcourir le marketplace à n'importe quel moment
+
+Que préfères-tu ?
+```
+
+Then either wait for a marketplace to be added and re-run the query, or skip to Phase 4. Do NOT fabricate recommendations in this situation.
+
 ### Section éducative — Palier 1 : Les basiques
 **Always present this section FIRST. This is mandatory.**
 
+Educational preamble (catalog-independent — keep verbatim in the user's language):
+
 ```
 Explain two basic component types:
-- **Skill**: a practice guide I follow (like an internal wiki). Example: coding-principles makes me systematic about DRY/KISS/SOLID. Without it I code well, with it I'm rigorous.
-- **Hook**: an automatic check at key moments (like a git hook). Example: pre-commit-check catches secrets and broken tests before each commit.
-- **Key difference**: a skill influences HOW I work; a hook verifies THE RESULT.
-Then present recommended skills and hooks from the catalog.
+- **Skill**: a practice guide I follow (like an internal wiki). A skill influences HOW I work. (Example shown for illustration only, not a prescription: a coding-principles skill would make me systematic about DRY/KISS/SOLID.)
+- **Hook**: an automatic check at key moments (like a git hook). A hook verifies THE RESULT. (Example for illustration only: a pre-commit-check hook would catch secrets and broken tests before each commit.)
+- **Key difference**: a skill guides behaviour, a hook validates output.
 ```
 
-Present the skills and hooks recommendations from the catalog, then:
+**Then — and only then — present the real Palier 1 items derived from the catalog response.**
 
+Rendering rules for Palier 1:
+1. Filter `data` to items where `type === 'skill' || type === 'hook'`.
+2. Group by type: skills first, hooks second.
+3. For each group, render each item on its own line using:
+   `📦 <name> — <description>`
+   Prefix the skills group with `🧠 Skills disponibles :` and the hooks group with `🪝 Hooks disponibles :`.
+4. If a group is empty (no skills OR no hooks in the catalog), omit that group's heading entirely — do not pretend items exist.
+5. Do NOT split into "essential" / "supplémentaires" sub-sections. The catalog schema does not carry an `essential` marker, so any such split would be fabrication. Present a flat list and let the user choose.
+6. If the catalog entry carries a `marketplace` other than `official`, append `  _(marketplace: <name>)_` on the same line so the user knows the origin.
+
+Close the Palier 1 message with:
 ```
-Voici les skills et hooks que je recommande pour votre projet :
-
-**🧠 Skills essentiels (fortement recommandés) :**
-📦 coding-principles — Principes de code universels (DRY, KISS, SOLID)
-📦 test-driven-development — Développement piloté par les tests
-📦 implement-feature — Workflow structuré d'implémentation de features
-📦 verification-before-completion — Vérification avant de déclarer un travail terminé
-
-**🧠 Skills supplémentaires :**
-📦 create-pr — Guide de création de pull requests
-📦 security-review — Revue de sécurité pour {{frameworks_detectes}}
-📦 systematic-debugging — Débogage méthodique en 4 phases
-
-**🪝 Hooks recommandés :**
-📦 pre-commit-check — Vérifie lint, tests et secrets avant chaque commit
-📦 dependency-check — Vérifie les dépendances obsolètes ou vulnérables
-📦 changelog-update — Met à jour le CHANGELOG automatiquement
-
 Des questions sur ces composants avant qu'on passe à la suite ?
 ```
 
 ### Section éducative — Palier 2 : Les composants avancés
 **Present this section only AFTER the user has acknowledged Palier 1.**
 
+Educational preamble (catalog-independent):
+
 ```
 Explain advanced component types:
-- **Agent**: a specialized expert hat I can wear. Example: architect agent analyzes patterns, security-auditor does OWASP audits.
-- **Recipe**: a full end-to-end workflow with validation checkpoints. Example: us-to-pr goes from ticket to PR step by step.
+- **Agent**: a specialized expert hat I can wear. (Example for illustration only: an architect agent would analyze patterns; a security-auditor would run OWASP checks.)
+- **Recipe**: a full end-to-end workflow with validation checkpoints. (Example for illustration only: a us-to-pr recipe would go from ticket to PR step by step.)
 - **Tool**: concrete access I'm given (GitHub, terminal, web). Without tools I can only talk, with them I act.
 - **Bundle**: your current starter kit — a pre-configured set of components.
 - **Key difference**: skill = continuous guidance, recipe = one-time procedure for a specific task.
-Then present recommended agents and recipes from the catalog.
 ```
 
-Present the agents and recipes recommendations:
+**Then — and only then — present the real Palier 2 items derived from the catalog response.**
+
+Rendering rules for Palier 2 (same discipline as Palier 1):
+1. Filter `data` to items where `type === 'agent' || type === 'recipe'`.
+2. Group by type: agents first, recipes second.
+3. Render each item as `📦 <name> — <description>`. Prefix agents with `🤖 Agents disponibles :` and recipes with `📋 Recipes disponibles :`.
+4. Omit empty groups. Do not invent items.
+5. Append the marketplace origin when it is not `official`.
+6. Do NOT present items of type `tool` here — tools are wired up by adapters, not chosen à la carte during onboarding.
+
+### Choix d'installation
+
+Once both paliers are presented, offer these options (no "essential" default because the catalog does not mark essentials):
 
 ```
-**🤖 Agents disponibles :**
-📦 code-reviewer — Revue de code contre le plan et les standards
-📦 architect — Analyse d'architecture et proposition de patterns
-📦 quality-guardian — Audit de qualité (complexité, duplication, dette, couverture)
-📦 security-auditor — Audit de sécurité (OWASP, injections, secrets, dépendances)
-
-**📋 Recipes recommandées :**
-📦 development/us-to-pr — Du ticket à la PR, étape par étape (avec points de contrôle)
-📦 development/bugfix — Workflow structuré de correction de bugs
-📦 review/pr-review — Revue de code complète
+Explain options:
+- **"install all"** — install every component shown above (both paliers)
+- **"install palier 1"** — only skills and hooks
+- **<component name(s)>** — pick specific ones, any mix across both paliers
+- **"browse"** — drill into a single item for more details before deciding
+- **"skip"** — install nothing for now; you can always come back later
+Remind the user that everything is uninstallable.
 ```
 
-**IMPORTANT:** Only recommend components that actually exist in the catalog. The lists above are examples of what might be available — always verify against the actual catalog before presenting.
+### Extensions d'onboarding — recommandations composants
 
-### Choix d'installation — Avec recommandation forte
+Exécute `anvil catalog skill --tag onboarding-extension --json` et, pour
+chaque entrée avec `onboarding-phase: components` dans son frontmatter, lis le
+skill et intègre ses recommandations de composants à la liste présentée à
+l'utilisateur (annote-les clairement comme "Recommandé par <description de
+l'extension>" pour que le dev sache d'où ça vient).
 
-```
-Recommend "all essential" as default (basic skills only, nothing intrusive). Remind everything is uninstallable. Options: "all essential" (recommended), "all recommended" (full set), "browse" (explore), component name (individual), "skip" (later).
-```
+Les recommandations d'extension ne **remplacent** pas la liste standard — elles
+la complètent, avec une annotation visible de leur source.
 
 ### Interactive Selection Process
 
@@ -314,7 +397,7 @@ Voici la structure de votre dossier `.anvil/` :
 ```
 .anvil/
   config.json    — La configuration principale (stack, composants, overrides)
-  docs/          — La documentation du projet (que j'utilise à chaque interaction)
+  wiki/          — Le wiki du projet (cartographie, getting started, architecture — que j'utilise à chaque interaction)
   skills/        — Les skills installés (fichiers texte lisibles et modifiables)
   hooks/         — Les hooks actifs
 ```
@@ -352,18 +435,38 @@ Explain: you'll build a complete project knowledge base in .anvil/wiki/ — a na
 
 ### Pre-condition — Bundle check
 
-Before doing anything in this phase, **check whether the bundle `legacy-archaeology` is installed**.
+Before doing anything in this phase, **check whether the bundle `legacy-archaeology` is installed AND whether the required components are even available to install**.
 
-- Read `.anvil/config.json` and inspect `components.skills` and `components.agents`
-- The bundle is considered **installed** if at minimum `legacy-cartographer` (agent), `analyze-codebase-deep`, `generate-project-wiki`, and `generate-runnable-readme` (skills) are present
+The bundle ships more components, but this phase only needs these four pipeline-critical ones:
+- `legacy-cartographer` (agent)
+- `analyze-codebase-deep` (skill)
+- `generate-project-wiki` (skill)
+- `generate-runnable-readme` (skill)
 
-**Two paths only — no third:**
+#### Step 1 — Check if already installed
+
+Read `.anvil/config.json` and inspect `components.skills` and `components.agents`. The bundle is considered **installed** for this phase's purposes if all four component names above are present (extra bundle components don't block the pipeline).
+
+If installed → **Path A** (skip directly to "Pipeline execution" below).
+
+#### Step 2 — If not installed, check availability in the configured marketplaces
+
+Run:
+
+```bash
+anvil catalog --json
+```
+
+Parse the `data` array and determine which of the four required names are present (match on `name` with the expected `type`). Compute the `missing` set = required minus present.
+
+- If `missing` is empty → **Path B** (everything is available, propose installation).
+- If `missing` is non-empty → **Path B-prime** (bundle not reachable from configured marketplaces).
 
 #### Path A — Bundle installed → run the pipeline
 
 Proceed directly to "Pipeline execution" below.
 
-#### Path B — Bundle not installed → propose installation, no degraded mode
+#### Path B — Bundle available in the catalog but not installed → propose installation
 
 ```
 📚 **Phase 4 — Génération du wiki documentaire**
@@ -406,6 +509,51 @@ Then proceed to "Pipeline execution" below.
 Skip directly to Phase 5. Set `"onboardingPhase": 4` in config without generating any wiki content. The `.anvil/wiki/` directory remains empty.
 
 If option 3, also set `"wikiOptOut": true` in `.anvil/config.json` so future sessions know not to suggest the wiki again.
+
+#### Path B-prime — Bundle NOT available in any configured marketplace
+
+Do **NOT** propose `anvil install` for missing components — it will fail and frustrate the user. Instead, be transparent about the situation.
+
+First, gather context to present it honestly:
+
+```bash
+anvil marketplace list --json
+```
+
+Then present:
+
+```
+📚 **Phase 4 — Génération du wiki documentaire**
+
+Le bundle `legacy-archaeology` n'est pas disponible dans les marketplaces que tu as configurés.
+
+**Composants manquants :** {{liste_des_noms_manquants}}
+**Marketplaces configurés :** {{liste_depuis_anvil_marketplace_list}}
+
+Trois options :
+
+1. **Ajouter le marketplace qui contient ce bundle** — je peux t'aider avec `anvil marketplace add <nom> --git <url>` si tu connais l'URL, puis on relance la vérification
+2. **Passer cette phase sans wiki pour l'instant** — tu pourras toujours lancer la génération plus tard quand le bundle sera disponible (je te réexpliquerai la commande en Phase 6)
+3. **Ne plus en parler** — je marque `wikiOptOut: true` dans la config et on n'y revient plus
+
+Que préfères-tu ?
+```
+
+**If user chooses option 1 (add a marketplace):**
+
+1. Ask for the marketplace name and Git URL (and optionally ref/branch).
+2. Run `anvil marketplace add <name> --git <url>`. If it fails, report the error and return to the three-option choice.
+3. On success, re-run `anvil catalog --json` and recompute `missing`.
+4. If `missing` is now empty → fall into **Path B** (propose installation).
+5. If `missing` is still non-empty → tell the user which components are still absent and re-present the three options.
+
+**If user chooses option 2 (skip for now):**
+
+Skip directly to Phase 5. Set `"onboardingPhase": 4` in config. The `.anvil/wiki/` directory remains empty. Do NOT set `wikiOptOut` — the user may come back to it.
+
+**If user chooses option 3 (never):**
+
+Skip directly to Phase 5. Set `"onboardingPhase": 4` and `"wikiOptOut": true` in `.anvil/config.json`.
 
 ### New Project Workflow
 
