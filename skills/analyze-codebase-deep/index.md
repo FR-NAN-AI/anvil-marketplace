@@ -1,4 +1,5 @@
 ---
+hard_gate: "Do NOT read files at random. Layers 1-3 (Glob, Grep, structured reads) MUST complete before any Layer 4 strategic sample reading. If you find yourself reading random files in full, you have skipped a layer — stop and go back."
 ---
 
 # Deep Codebase Analysis — 4-Layer Method

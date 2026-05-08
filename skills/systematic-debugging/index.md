@@ -1,4 +1,5 @@
 ---
+hard_gate: "Do NOT propose or apply a fix before identifying the root cause through systematic investigation. Quick patches that mask root causes are not acceptable."
 ---
 
 # Systematic Debugging

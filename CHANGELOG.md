@@ -13,6 +13,13 @@ and this marketplace adheres to [Semantic Versioning](https://semver.org/spec/v2
   `legacy-cartographer`, and `requirement-analyzer` enforced this; now
   `task-executor`, `code-reviewer`, `quality-guardian`, and `security-auditor`
   do as well. Closes MKT-01 and MKT-07.
+- Restricted the `bash-dev` tool's allowlist to specific sub-commands
+  (`git:status/diff/log/branch/checkout/commit/push`, `npm:install/test/run-script`,
+  `node:--version`, `python:--version/-m`) instead of wildcards
+  (`git:*`, `npm`, `node`, `python`). The previous wildcards left an RCE
+  vector through hostile `package.json` postinstalls or piped Python
+  scripts. Closes MKT-02. Note: the allowlist is currently informational —
+  no surface adapter translates it into native sandbox rules yet.
 
 ### Added
 - `SECURITY.md` — declares the private disclosure channel (GitHub Security
@@ -21,6 +28,13 @@ and this marketplace adheres to [Semantic Versioning](https://semver.org/spec/v2
   and the security checklist authors must satisfy.
 - `CHANGELOG.md` — this file. Adopts Keep a Changelog + SemVer to match the
   anvil CLI release discipline.
+
+### Changed
+- Reinstated `hard_gate` frontmatter on skills whose central discipline is
+  an explicit "Iron Law": `test-driven-development`, `systematic-debugging`,
+  `verification-before-completion`, `analyze-codebase-deep`. The pattern
+  had drifted on recent additions; this aligns the marketplace and gives
+  reviewers a clear at-a-glance signal of each skill's hard guardrail.
 
 ## [0.1.0] - 2026-05-08
 

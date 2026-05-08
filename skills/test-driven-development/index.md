@@ -1,4 +1,5 @@
 ---
+hard_gate: "Do NOT write production code before a failing test exists. If you did not watch the test fail, you do not know it tests the right thing."
 ---
 
 # Test-Driven Development (TDD)

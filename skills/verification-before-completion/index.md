@@ -1,4 +1,5 @@
 ---
+hard_gate: "Do NOT claim work is complete, fixed, or passing before running verification commands and confirming the output. Evidence before claims, always."
 ---
 
 # Verification Before Completion
