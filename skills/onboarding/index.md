@@ -225,13 +225,18 @@ Après les vérifications standards ci-dessus, exécute :
 anvil catalog skill --tag onboarding-extension --json
 ```
 
-Pour chaque entrée dont le frontmatter YAML inclut `onboarding-phase: prerequisites`
-(lis le fichier via son `path` dans le catalog), traite son contenu comme un
-ensemble de prérequis additionnels à vérifier. Présente-les à l'utilisateur
-regroupés par extension (utilise la `description` du catalog comme en-tête de
-groupe), puis exécute les vérifications décrites dans le skill.
+Parse la réponse `{ ok: true, data: [...] }` et garde uniquement les entrées
+dont `onboarding-phase === "prerequisites"`. Pour chacune, lis le fichier
+pointé par son `path` dans le catalog (c'est `index.md` du skill) et traite
+son contenu comme un ensemble de prérequis additionnels à vérifier. Présente-les
+à l'utilisateur regroupés par extension (utilise la `description` du catalog
+comme en-tête de groupe), puis exécute les vérifications décrites dans le skill.
 
-Si aucune extension ne matche cette phase, continue normalement.
+Si aucune entrée n'a `onboarding-phase: "prerequisites"`, continue normalement.
+
+> **Note** : `onboarding-phase` est résolu par anvil depuis le `component.yaml`
+> du composant. Ne lis pas le frontmatter de `index.md` toi-même — anvil
+> s'en charge et expose la valeur dans le JSON catalog.
 
 After user confirmation, update config: `"onboardingPhase": 2`
 
@@ -353,10 +358,10 @@ Remind the user that everything is uninstallable.
 ### Extensions d'onboarding — recommandations composants
 
 Exécute `anvil catalog skill --tag onboarding-extension --json` et, pour
-chaque entrée avec `onboarding-phase: components` dans son frontmatter, lis le
-skill et intègre ses recommandations de composants à la liste présentée à
-l'utilisateur (annote-les clairement comme "Recommandé par <description de
-l'extension>" pour que le dev sache d'où ça vient).
+chaque entrée avec `onboarding-phase === "components"`, lis le fichier
+pointé par son `path` et intègre ses recommandations de composants à la
+liste présentée à l'utilisateur (annote-les clairement comme "Recommandé
+par <description de l'extension>" pour que le dev sache d'où ça vient).
 
 Les recommandations d'extension ne **remplacent** pas la liste standard — elles
 la complètent, avec une annotation visible de leur source.
@@ -639,6 +644,28 @@ Une dernière revue avant qu'on passe à la suite ? Y a-t-il une page que tu veu
 
 **CRITICAL: Do NOT rush through this phase. The quality of the wiki directly determines the quality of every future agent interaction with this project.**
 
+### Extensions d'onboarding — documentation
+
+Une fois le wiki finalisé, exécute :
+
+```bash
+anvil catalog skill --tag onboarding-extension --json
+```
+
+Pour chaque entrée avec `onboarding-phase === "documentation"`, lis le
+fichier pointé par son `path` et exécute les instructions qu'il contient.
+Ces extensions interviennent **après** que le wiki soit généré : elles
+peuvent enrichir la doc (ex : générer une vue chapeau multi-modules),
+indexer les pages produites, ou lancer une recipe d'orchestration.
+
+Présente brièvement à l'utilisateur ce que chaque extension va faire (1
+ligne par extension, basée sur sa `description`), puis exécute-les. Si
+une extension échoue, continue avec les suivantes et rapporte l'erreur
+en fin de phase.
+
+Si aucune entrée n'a `onboarding-phase: "documentation"`, continue
+normalement.
+
 After user confirmation, update config: `"onboardingPhase": 4`
 
 ---
@@ -701,11 +728,51 @@ Concrètement, ça signifie :
 On procède ? (oui/non)
 ```
 
+### Extensions d'onboarding — configuration
+
+Après avoir appliqué les overrides standards, exécute :
+
+```bash
+anvil catalog skill --tag onboarding-extension --json
+```
+
+Pour chaque entrée avec `onboarding-phase === "configuration"`, lis le
+fichier pointé par son `path` et applique les configurations qu'il
+décrit. Ces extensions peuvent ajouter des overrides spécifiques à un
+contexte (organisation, équipe, stack interne) qui ne sont pas couverts
+par la liste standard d'overrides.
+
+Pour chaque extension, montre la diff de config proposée et demande
+confirmation avant d'écrire dans `.anvil/config.json`.
+
+Si aucune entrée n'a `onboarding-phase: "configuration"`, continue
+normalement.
+
 After user confirmation, update config: `"onboardingPhase": 5`
 
 ---
 
 ## Phase 6 : Conclusion et guide de démarrage
+
+### Extensions d'onboarding — finalize
+
+Avant de marquer l'onboarding comme terminé, exécute :
+
+```bash
+anvil catalog skill --tag onboarding-extension --json
+```
+
+Pour chaque entrée avec `onboarding-phase === "finalize"`, lis le fichier
+pointé par son `path` et exécute les instructions de finalisation. Ces
+extensions interviennent juste avant la complétion de l'onboarding —
+typiquement pour valider une convention d'équipe, créer un fichier de
+métadonnées, ou notifier un système externe.
+
+Si une extension échoue, **ne** marque **pas** l'onboarding comme
+terminé tant que l'utilisateur n'a pas confirmé qu'il accepte de
+continuer malgré l'erreur.
+
+Si aucune entrée n'a `onboarding-phase: "finalize"`, continue normalement.
 
 ### Mark Onboarding Complete
 Update `.anvil/config.json` with:
