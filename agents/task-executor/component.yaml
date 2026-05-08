@@ -11,6 +11,7 @@ targets:
     supported: true
     model: sonnet
     tools: Read, Grep, Glob, Bash, Edit, Write
+    permissionMode: plan
   cursor:
     supported: true
 entry:
