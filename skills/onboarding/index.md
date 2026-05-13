@@ -148,6 +148,33 @@ Je vois que votre projet est tout neuf — pas encore de fichiers de configurati
 Pour l'instant, avez-vous déjà une idée de la stack que vous voulez utiliser ?
 ```
 
+### Persist findings — required
+
+Once the user has confirmed the detected stack, **persist the result under
+the `detectedStack` key at the root of `.anvil/config.json`**. This is the
+only schema-supported location for these findings — do NOT invent another
+top-level key (e.g. `stack`, `detected`, `phase1Result`), it will be
+rejected by the strict config schema and the catalog will fall back to
+the official-only marketplace until you fix it.
+
+The shape is free-form (`detectedStack: object`), so include only what
+you actually detected. Typical fields:
+
+```json
+{
+  "detectedStack": {
+    "language": "node",
+    "framework": "react",
+    "database": "postgres",
+    "ticketSystem": "jira",
+    "buildTool": "vite"
+  }
+}
+```
+
+Downstream phases (tools check, component recommendations, wiki
+generation) read this object — keep it accurate.
+
 After user confirmation, update config: `"onboardingPhase": 1`
 
 ---
