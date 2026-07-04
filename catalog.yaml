@@ -105,6 +105,10 @@ items:
     name: dependency-check
     path: hooks/dependency-check
     description: Check for outdated or vulnerable dependencies
+  - type: hook
+    name: wiki-freshness
+    path: hooks/wiki-freshness
+    description: At session start, warn when the wiki has drifted from the code and offer to run doc-sync
 
   # Tools
   - type: tool
@@ -157,6 +161,10 @@ items:
     name: review/post-merge-check
     path: recipes/review/post-merge-check
     description: Post-merge health check
+  - type: recipe
+    name: maintenance/doc-sync
+    path: recipes/maintenance/doc-sync
+    description: Refresh the project wiki from the git delta and linked tickets, then open a PR
 
   # Bundles
   - type: bundle

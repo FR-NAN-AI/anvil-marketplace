@@ -1,0 +1,17 @@
+schema: anvil.component/v1
+type: hook
+name: wiki-freshness
+title: Wiki Freshness
+version: 0.1.0
+description: At session start, warn when the project wiki has drifted from the code and offer to run doc-sync
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+  opencode:
+    supported: true
+entry:
+  file: index.md

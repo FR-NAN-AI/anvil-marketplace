@@ -1,0 +1,17 @@
+schema: anvil.component/v1
+type: recipe
+name: maintenance/doc-sync
+title: Maintenance/doc Sync
+version: 0.1.0
+description: Refresh the project wiki from the git delta and linked tickets, then open a PR
+targets:
+  copilot:
+    supported: true
+  claude:
+    supported: true
+  cursor:
+    supported: true
+  opencode:
+    supported: true
+entry:
+  file: index.md
