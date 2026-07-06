@@ -249,21 +249,27 @@ Present tool status grouped by: CLI Tools (✅/❌ with version), MCP Connection
 Après les vérifications standards ci-dessus, exécute :
 
 ```bash
-anvil catalog skill --tag onboarding-extension --json
+anvil catalog skill --tag onboarding-extension --phase prerequisites --json
 ```
 
-Parse la réponse `{ ok: true, data: [...] }` et garde uniquement les entrées
-dont `onboarding-phase === "prerequisites"`. Pour chacune, lis le fichier
-pointé par son `path` dans le catalog (c'est `index.md` du skill) et traite
-son contenu comme un ensemble de prérequis additionnels à vérifier. Présente-les
-à l'utilisateur regroupés par extension (utilise la `description` du catalog
-comme en-tête de groupe), puis exécute les vérifications décrites dans le skill.
+Parse la réponse `{ ok: true, data: [...] }` : **chaque entrée retournée
+concerne déjà cette phase** (le filtrage est fait côté anvil). Pour chacune,
+lis le fichier pointé par son `path` dans le catalog (c'est `index.md` du skill)
+et traite son contenu comme un ensemble de prérequis additionnels à vérifier.
+Présente-les à l'utilisateur regroupés par extension (utilise la `description`
+du catalog comme en-tête de groupe), puis exécute les vérifications décrites
+dans le skill.
 
-Si aucune entrée n'a `onboarding-phase: "prerequisites"`, continue normalement.
+Si `data` est vide, continue normalement.
 
+> **Important** : laisse anvil filtrer via `--phase`. Ne pipe **jamais** la
+> sortie JSON vers `node -e` / `jq` pour filtrer toi-même — le pattern
+> `... --json | node -e "..."` échoue avec `stdin is not a tty` sur Windows
+> Git Bash (mintty) et l'extension est alors silencieusement ignorée.
+>
 > **Note** : `onboarding-phase` est résolu par anvil depuis le `component.yaml`
 > du composant. Ne lis pas le frontmatter de `index.md` toi-même — anvil
-> s'en charge et expose la valeur dans le JSON catalog.
+> s'en charge et applique le filtre `--phase`.
 
 After user confirmation, update config: `"onboardingPhase": 2`
 
@@ -384,14 +390,22 @@ Remind the user that everything is uninstallable.
 
 ### Extensions d'onboarding — recommandations composants
 
-Exécute `anvil catalog skill --tag onboarding-extension --json` et, pour
-chaque entrée avec `onboarding-phase === "components"`, lis le fichier
-pointé par son `path` et intègre ses recommandations de composants à la
+Exécute :
+
+```bash
+anvil catalog skill --tag onboarding-extension --phase components --json
+```
+
+Pour chaque entrée retournée (toutes concernent déjà cette phase), lis le
+fichier pointé par son `path` et intègre ses recommandations de composants à la
 liste présentée à l'utilisateur (annote-les clairement comme "Recommandé
 par <description de l'extension>" pour que le dev sache d'où ça vient).
 
 Les recommandations d'extension ne **remplacent** pas la liste standard — elles
 la complètent, avec une annotation visible de leur source.
+
+> **Important** : laisse anvil filtrer via `--phase`. Ne pipe jamais la sortie
+> JSON vers `node -e` / `jq` (échoue sur Windows Git Bash — voir Phase 2).
 
 ### Interactive Selection Process
 
@@ -676,10 +690,10 @@ Une dernière revue avant qu'on passe à la suite ? Y a-t-il une page que tu veu
 Une fois le wiki finalisé, exécute :
 
 ```bash
-anvil catalog skill --tag onboarding-extension --json
+anvil catalog skill --tag onboarding-extension --phase documentation --json
 ```
 
-Pour chaque entrée avec `onboarding-phase === "documentation"`, lis le
+Pour chaque entrée retournée (toutes concernent déjà cette phase), lis le
 fichier pointé par son `path` et exécute les instructions qu'il contient.
 Ces extensions interviennent **après** que le wiki soit généré : elles
 peuvent enrichir la doc (ex : générer une vue chapeau multi-modules),
@@ -690,8 +704,10 @@ ligne par extension, basée sur sa `description`), puis exécute-les. Si
 une extension échoue, continue avec les suivantes et rapporte l'erreur
 en fin de phase.
 
-Si aucune entrée n'a `onboarding-phase: "documentation"`, continue
-normalement.
+Si `data` est vide, continue normalement.
+
+> **Important** : laisse anvil filtrer via `--phase`. Ne pipe jamais la sortie
+> JSON vers `node -e` / `jq` (échoue sur Windows Git Bash — voir Phase 2).
 
 After user confirmation, update config: `"onboardingPhase": 4`
 
@@ -760,10 +776,10 @@ On procède ? (oui/non)
 Après avoir appliqué les overrides standards, exécute :
 
 ```bash
-anvil catalog skill --tag onboarding-extension --json
+anvil catalog skill --tag onboarding-extension --phase configuration --json
 ```
 
-Pour chaque entrée avec `onboarding-phase === "configuration"`, lis le
+Pour chaque entrée retournée (toutes concernent déjà cette phase), lis le
 fichier pointé par son `path` et applique les configurations qu'il
 décrit. Ces extensions peuvent ajouter des overrides spécifiques à un
 contexte (organisation, équipe, stack interne) qui ne sont pas couverts
@@ -772,8 +788,10 @@ par la liste standard d'overrides.
 Pour chaque extension, montre la diff de config proposée et demande
 confirmation avant d'écrire dans `.anvil/config.json`.
 
-Si aucune entrée n'a `onboarding-phase: "configuration"`, continue
-normalement.
+Si `data` est vide, continue normalement.
+
+> **Important** : laisse anvil filtrer via `--phase`. Ne pipe jamais la sortie
+> JSON vers `node -e` / `jq` (échoue sur Windows Git Bash — voir Phase 2).
 
 After user confirmation, update config: `"onboardingPhase": 5`
 
@@ -786,11 +804,11 @@ After user confirmation, update config: `"onboardingPhase": 5`
 Avant de marquer l'onboarding comme terminé, exécute :
 
 ```bash
-anvil catalog skill --tag onboarding-extension --json
+anvil catalog skill --tag onboarding-extension --phase finalize --json
 ```
 
-Pour chaque entrée avec `onboarding-phase === "finalize"`, lis le fichier
-pointé par son `path` et exécute les instructions de finalisation. Ces
+Pour chaque entrée retournée (toutes concernent déjà cette phase), lis le
+fichier pointé par son `path` et exécute les instructions de finalisation. Ces
 extensions interviennent juste avant la complétion de l'onboarding —
 typiquement pour valider une convention d'équipe, créer un fichier de
 métadonnées, ou notifier un système externe.
@@ -799,7 +817,10 @@ Si une extension échoue, **ne** marque **pas** l'onboarding comme
 terminé tant que l'utilisateur n'a pas confirmé qu'il accepte de
 continuer malgré l'erreur.
 
-Si aucune entrée n'a `onboarding-phase: "finalize"`, continue normalement.
+Si `data` est vide, continue normalement.
+
+> **Important** : laisse anvil filtrer via `--phase`. Ne pipe jamais la sortie
+> JSON vers `node -e` / `jq` (échoue sur Windows Git Bash — voir Phase 2).
 
 ### Mark Onboarding Complete
 Update `.anvil/config.json` with:

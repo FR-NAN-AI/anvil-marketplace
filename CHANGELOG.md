@@ -21,6 +21,16 @@ and this marketplace adheres to [Semantic Versioning](https://semver.org/spec/v2
   scripts. Closes MKT-02. Note: the allowlist is currently informational —
   no surface adapter translates it into native sandbox rules yet.
 
+### Fixed
+- `onboarding` skill: the extension-discovery steps for every phase now use the
+  CLI-side filter `anvil catalog skill --tag onboarding-extension --phase <phase> --json`
+  instead of asking the agent to post-filter the JSON through `| node -e "..."`.
+  The pipe failed with `stdin is not a tty` on Windows Git Bash / mintty, so
+  onboarding extensions (documentation, configuration, finalize phases) were
+  silently ignored. Each extension section now also warns against piping JSON
+  into `node -e` / `jq`. Requires anvil >= 0.8.3 (which adds the `--phase` flag).
+  Mirrors [anvil#3](https://github.com/FR-NAN-AI/anvil/issues/3).
+
 ### Added
 - `SECURITY.md` — declares the private disclosure channel (GitHub Security
   Advisories) and the security expectations for new components.
